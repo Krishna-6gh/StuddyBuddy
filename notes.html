@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Learnings</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h2>📚 My Learnings</h2>
+<div id="notesContainer"></div>
+
+<script>
+const notes = JSON.parse(localStorage.getItem("notes")) || [];
+const container = document.getElementById("notesContainer");
+
+notes.forEach(n => {
+  container.innerHTML += `
+    <div class="card">
+      <h3>${n.title}</h3>
+      <p>${n.content}</p>
+      <small>${n.date}</small>
+    </div>
+  `;
+});
+</script>
+
+</body>
+</html>

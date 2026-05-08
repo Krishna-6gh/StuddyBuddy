@@ -1,0 +1,2202 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Resource Hub — StudyBuddy</title>
+
+<script>
+  (function(){
+    try{
+      const t=localStorage.getItem('colorMode')||'light';
+      document.documentElement.setAttribute('data-theme', t==='dark'?'dark':'light');
+    }catch(e){}
+  })();
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+
+<style>
+/* ═══════════════════════════════════════
+   RESOURCE HUB — PREMIUM STYLES
+═══════════════════════════════════════ */
+
+/* Body fade in */
+body { opacity:0; animation: bodyFadeIn 0.5s 0.1s ease forwards; }
+@keyframes bodyFadeIn { to { opacity:1; } }
+
+/* ── PAGE HERO ── */
+.rh-hero {
+  padding: 88px 5% 60px;
+  position: relative;
+  overflow: hidden;
+}
+.rh-hero-inner {
+  max-width: 900px;
+  margin: 0 auto;
+  text-align: center;
+  position: relative;
+  z-index: 2;
+}
+.rh-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--primary-light);
+  color: var(--primary);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  padding: 6px 16px;
+  border-radius: 50px;
+  border: 1px solid color-mix(in srgb, var(--primary) 20%, transparent);
+  margin-bottom: 22px;
+  animation: fadeUp 0.6s 0.2s ease both;
+}
+.rh-hero-title {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(2.4rem, 5vw, 4rem);
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--text);
+  margin-bottom: 18px;
+  animation: fadeUp 0.6s 0.3s ease both;
+}
+.rh-hero-title .grad {
+  background: linear-gradient(135deg, var(--primary) 0%, #6366f1 60%, #06b6d4 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.rh-hero-sub {
+  font-size: 1.05rem;
+  color: var(--text-muted);
+  max-width: 560px;
+  margin: 0 auto 36px;
+  line-height: 1.7;
+  animation: fadeUp 0.6s 0.4s ease both;
+}
+
+/* Hero stats strip */
+.rh-stats {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  flex-wrap: wrap;
+  animation: fadeUp 0.6s 0.5s ease both;
+}
+.rh-stat {
+  background: color-mix(in srgb, var(--surface) 80%, transparent);
+  border: 1px solid var(--surface-border);
+  border-radius: 16px;
+  padding: 14px 24px;
+  backdrop-filter: blur(16px);
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.rh-stat:hover { transform: translateY(-4px); box-shadow: var(--shadow); }
+.rh-stat-num { font-family: 'Syne', sans-serif; font-size: 1.6rem; font-weight: 800; color: var(--primary); }
+.rh-stat-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-muted); margin-top: 2px; }
+
+/* ── SUBJECT GRID ── */
+.rh-section {
+  padding: 0 5% 80px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+.rh-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+.rh-section-head h2 {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--text);
+}
+.rh-section-head .section-label {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--primary);
+  margin-bottom: 4px;
+}
+
+/* Search bar */
+.rh-search-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
+  border-radius: 50px;
+  padding: 8px 18px;
+  backdrop-filter: blur(16px);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  min-width: 280px;
+}
+.rh-search-wrap:focus-within {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-glow);
+}
+.rh-search-wrap input {
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  width: 100%;
+}
+.rh-search-wrap input::placeholder { color: var(--text-muted); }
+.rh-search-icon { color: var(--text-muted); flex-shrink: 0; }
+
+/* Subject cards grid */
+.subject-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 22px;
+}
+
+/* Subject card */
+.subject-card {
+  position: relative;
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
+  border: 1px solid var(--surface-border);
+  border-radius: 24px;
+  padding: 28px;
+  cursor: pointer;
+  overflow: hidden;
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.06);
+  transition: transform 0.35s cubic-bezier(0.16,1,0.3,1),
+              box-shadow 0.35s cubic-bezier(0.16,1,0.3,1),
+              border-color 0.3s ease;
+  animation: cardPop 0.5s ease both;
+}
+.subject-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 24px;
+  background: radial-gradient(ellipse 80% 60% at 20% 20%, var(--card-glow, rgba(5,150,105,0.08)), transparent 65%);
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+.subject-card:hover {
+  transform: translateY(-8px) scale(1.01);
+  box-shadow: 0 24px 64px rgba(0,0,0,0.14);
+  border-color: color-mix(in srgb, var(--card-accent, var(--primary)) 35%, transparent);
+}
+.subject-card:hover::before { opacity: 1.5; }
+.subject-card:active { transform: translateY(-4px) scale(0.99); }
+
+@keyframes cardPop {
+  from { opacity: 0; transform: translateY(24px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.card-emoji {
+  font-size: 2.6rem;
+  margin-bottom: 16px;
+  display: block;
+  filter: drop-shadow(0 4px 12px rgba(0,0,0,0.15));
+}
+.card-chip {
+  display: inline-block;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 4px 12px;
+  border-radius: 50px;
+  background: var(--primary-light);
+  color: var(--primary);
+  margin-bottom: 10px;
+}
+.card-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 8px;
+  line-height: 1.3;
+}
+.card-desc {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+.card-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.card-resources {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+.card-res-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--primary);
+  display: inline-block;
+}
+.card-cta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--primary);
+  transition: gap 0.2s ease;
+}
+.subject-card:hover .card-cta { gap: 10px; }
+.card-bookmark {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+  z-index: 2;
+}
+.card-bookmark:hover { background: var(--primary-light); transform: scale(1.15); }
+.card-bookmark.bookmarked { background: var(--primary-light); color: var(--primary); }
+
+/* Trending badge */
+.trending-badge {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  background: linear-gradient(135deg, #f59e0b, #ef4444);
+  color: white;
+  font-size: 0.6rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  padding: 3px 10px;
+  border-radius: 50px;
+}
+
+/* Progress bar on card */
+.card-progress-wrap {
+  margin-bottom: 16px;
+}
+.card-progress-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+.card-progress-bar {
+  height: 4px;
+  background: var(--primary-light);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.card-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), #6366f1);
+  border-radius: 2px;
+  transition: width 0.8s ease;
+}
+
+/* ── MODAL OVERLAY ── */
+.rh-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  background: color-mix(in srgb, var(--bg) 72%, transparent);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  display: flex;
+  align-items: stretch;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s cubic-bezier(0.16,1,0.3,1);
+}
+.rh-modal-overlay.open {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* Modal panel */
+.rh-modal {
+  position: relative;
+  width: 100%;
+  max-width: 1100px;
+  margin: auto;
+  height: calc(100vh - 48px);
+  max-height: 900px;
+  background: color-mix(in srgb, var(--bg-2) 90%, transparent);
+  border: 1px solid var(--surface-border);
+  border-radius: 28px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 40px 120px rgba(0,0,0,0.22);
+  transform: translateY(40px) scale(0.97);
+  transition: transform 0.4s cubic-bezier(0.16,1,0.3,1);
+}
+.rh-modal-overlay.open .rh-modal {
+  transform: translateY(0) scale(1);
+}
+
+/* Modal header */
+.modal-header {
+  padding: 24px 28px 0;
+  border-bottom: 1px solid var(--surface-border);
+  flex-shrink: 0;
+  position: relative;
+  background: color-mix(in srgb, var(--bg-2) 85%, transparent);
+  backdrop-filter: blur(20px);
+}
+.modal-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+.modal-subject-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.modal-emoji {
+  font-size: 2.2rem;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+}
+.modal-subject-name {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1.2;
+}
+.modal-subject-sub {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+.modal-close {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.2s, color 0.2s, transform 0.2s;
+  flex-shrink: 0;
+}
+.modal-close:hover { background: #ef444422; color: #ef4444; transform: rotate(90deg); }
+
+/* Tab bar */
+.modal-tabs {
+  display: flex;
+  gap: 4px;
+}
+.modal-tab {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 20px;
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  border-radius: 12px 12px 0 0;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  position: relative;
+  transition: color 0.2s, background 0.2s;
+  font-family: 'DM Sans', sans-serif;
+}
+.modal-tab:hover { color: var(--text); background: var(--primary-light); }
+.modal-tab.active {
+  color: var(--primary);
+  background: var(--primary-light);
+}
+.modal-tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0; right: 0;
+  height: 2px;
+  background: var(--primary);
+  border-radius: 2px 2px 0 0;
+}
+.tab-count {
+  font-size: 0.68rem;
+  font-weight: 800;
+  background: var(--primary);
+  color: white;
+  padding: 2px 7px;
+  border-radius: 50px;
+  min-width: 20px;
+  text-align: center;
+}
+.modal-tab:not(.active) .tab-count {
+  background: var(--surface-border);
+  color: var(--text-muted);
+}
+
+/* Modal body */
+.modal-body {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.tab-panel {
+  display: none;
+  flex-direction: column;
+  height: 100%;
+  overflow-y: auto;
+  padding: 28px;
+  gap: 20px;
+}
+.tab-panel.active { display: flex; }
+.tab-panel::-webkit-scrollbar { width: 6px; }
+.tab-panel::-webkit-scrollbar-track { background: transparent; }
+.tab-panel::-webkit-scrollbar-thumb { background: var(--surface-border); border-radius: 3px; }
+
+/* ── AI RECOMMENDATION BANNER ── */
+.ai-banner {
+  background: linear-gradient(135deg, 
+    color-mix(in srgb, var(--primary) 8%, transparent),
+    color-mix(in srgb, #6366f1 6%, transparent));
+  border: 1px solid color-mix(in srgb, var(--primary) 20%, transparent);
+  border-radius: 20px;
+  padding: 20px 24px;
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  flex-shrink: 0;
+}
+.ai-banner-icon {
+  width: 44px; height: 44px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--primary), #6366f1);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+  box-shadow: 0 8px 20px var(--primary-glow);
+}
+.ai-banner-content { flex: 1; min-width: 0; }
+.ai-banner-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+.ai-banner-text {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+.ai-regen-btn {
+  padding: 8px 16px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: opacity 0.2s, transform 0.2s;
+  align-self: center;
+}
+.ai-regen-btn:hover { opacity: 0.85; transform: translateY(-1px); }
+.ai-regen-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+/* ── RESOURCE CARDS ── */
+.resource-section-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.resource-section-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--surface-border);
+}
+
+/* Video grid */
+.video-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+.video-card {
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
+  border-radius: 16px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+}
+.video-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.1);
+  border-color: color-mix(in srgb, var(--primary) 25%, transparent);
+}
+.video-thumb-wrap {
+  position: relative;
+  aspect-ratio: 16/9;
+  background: var(--bg);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.video-thumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+.video-card:hover .video-thumb { transform: scale(1.05); }
+.video-play-btn {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.35);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.video-card:hover .video-play-btn { opacity: 1; }
+.play-circle {
+  width: 50px; height: 50px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.92);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem;
+  transform: scale(0.85);
+  transition: transform 0.3s ease;
+}
+.video-card:hover .play-circle { transform: scale(1); }
+.video-duration {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  background: rgba(0,0,0,0.82);
+  color: white;
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+.video-info {
+  padding: 14px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.video-title {
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.4;
+  margin-bottom: 8px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.video-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+}
+.video-channel {
+  font-size: 0.73rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.channel-dot {
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), #6366f1);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.55rem;
+  color: white;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.video-views {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.video-bm-btn {
+  padding: 5px 10px;
+  background: transparent;
+  border: 1px solid var(--surface-border);
+  border-radius: 8px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'DM Sans', sans-serif;
+}
+.video-bm-btn:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
+.video-bm-btn.saved { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
+
+/* Web reference cards */
+.webref-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.webref-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
+  border-radius: 16px;
+  padding: 16px 20px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.webref-card:hover {
+  transform: translateX(6px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  border-color: color-mix(in srgb, var(--primary) 25%, transparent);
+}
+.webref-favicon {
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: var(--primary-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  overflow: hidden;
+}
+.webref-favicon img {
+  width: 100%; height: 100%;
+  object-fit: contain;
+  border-radius: 8px;
+}
+.webref-info { flex: 1; min-width: 0; }
+.webref-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.webref-desc {
+  font-size: 0.77rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.webref-domain {
+  font-size: 0.7rem;
+  color: var(--primary);
+  font-weight: 600;
+  margin-top: 3px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.webref-badge {
+  padding: 4px 12px;
+  border-radius: 50px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.badge-free { background: rgba(16,185,129,0.12); color: #059669; }
+.badge-pdf  { background: rgba(239,68,68,0.12); color: #ef4444; }
+.badge-pro  { background: rgba(99,102,241,0.12); color: #6366f1; }
+.webref-arrow { color: var(--text-muted); font-size: 1rem; flex-shrink: 0; transition: transform 0.2s; }
+.webref-card:hover .webref-arrow { transform: translateX(4px); color: var(--primary); }
+
+/* Notes tab — PDF / notes cards */
+.notes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+.note-card {
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
+  border-radius: 16px;
+  padding: 20px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.note-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.1);
+}
+.note-card-icon {
+  width: 48px; height: 48px;
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+.icon-pdf { background: rgba(239,68,68,0.12); }
+.icon-doc { background: rgba(59,130,246,0.12); }
+.icon-ppt { background: rgba(245,158,11,0.12); }
+.icon-web { background: rgba(16,185,129,0.12); }
+.note-card-title {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.4;
+}
+.note-card-source {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+.note-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+}
+.note-dl-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: var(--primary-light);
+  color: var(--primary);
+  border: none;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: background 0.2s, transform 0.2s;
+}
+.note-dl-btn:hover { background: var(--primary); color: white; transform: translateY(-1px); }
+.note-size {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+/* ── SKELETON LOADER ── */
+.skeleton {
+  background: linear-gradient(90deg,
+    var(--surface-border) 25%,
+    color-mix(in srgb, var(--surface-border) 60%, transparent) 50%,
+    var(--surface-border) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.6s infinite;
+  border-radius: 10px;
+}
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+.skeleton-card {
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
+  border-radius: 16px;
+  padding: 16px;
+  overflow: hidden;
+}
+.skeleton-line { height: 12px; margin-bottom: 8px; }
+.skeleton-line.wide  { width: 90%; }
+.skeleton-line.medium { width: 65%; }
+.skeleton-line.short { width: 40%; }
+.skeleton-thumb { width: 100%; height: 160px; border-radius: 10px; margin-bottom: 12px; }
+.skeleton-circle { width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0; }
+
+/* ── LEARNING PATH ── */
+.learning-path {
+  background: color-mix(in srgb, var(--surface) 60%, transparent);
+  border: 1px solid var(--surface-border);
+  border-radius: 20px;
+  padding: 22px;
+  flex-shrink: 0;
+}
+.lp-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.lp-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.lp-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--surface-border);
+  animation: fadeUp 0.4s ease both;
+}
+.lp-step:last-child { border-bottom: none; }
+.lp-step-num {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: var(--primary-light);
+  color: var(--primary);
+  font-size: 0.75rem;
+  font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.lp-step.done .lp-step-num {
+  background: var(--primary);
+  color: white;
+}
+.lp-step-body { flex: 1; }
+.lp-step-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 3px;
+}
+.lp-step-desc {
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+.lp-step-tag {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 2px 9px;
+  border-radius: 50px;
+  background: var(--accent-light);
+  color: var(--accent);
+  flex-shrink: 0;
+  align-self: flex-start;
+  margin-top: 4px;
+}
+
+/* ── ERROR STATE ── */
+.error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 60px 20px;
+  text-align: center;
+  flex: 1;
+}
+.error-icon { font-size: 3rem; }
+.error-title { font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 700; color: var(--text); }
+.error-desc { font-size: 0.85rem; color: var(--text-muted); max-width: 360px; line-height: 1.6; }
+.error-retry-btn {
+  padding: 10px 24px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: opacity 0.2s;
+}
+.error-retry-btn:hover { opacity: 0.85; }
+
+/* ── FLOATING PROGRESS TRACKER ── */
+.progress-tracker {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  z-index: 500;
+  background: color-mix(in srgb, var(--bg-2) 90%, transparent);
+  border: 1px solid var(--surface-border);
+  border-radius: 20px;
+  padding: 16px 20px;
+  box-shadow: var(--shadow-lg);
+  backdrop-filter: blur(24px);
+  min-width: 220px;
+  transform: translateY(100px);
+  opacity: 0;
+  transition: transform 0.4s cubic-bezier(0.16,1,0.3,1), opacity 0.4s ease;
+}
+.progress-tracker.visible {
+  transform: translateY(0);
+  opacity: 1;
+}
+.pt-title { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-muted); margin-bottom: 10px; }
+.pt-subject { font-family: 'Syne', sans-serif; font-size: 0.9rem; font-weight: 700; color: var(--text); margin-bottom: 8px; }
+.pt-bar { height: 6px; background: var(--primary-light); border-radius: 3px; overflow: hidden; margin-bottom: 6px; }
+.pt-fill { height: 100%; background: linear-gradient(90deg, var(--primary), #6366f1); border-radius: 3px; transition: width 0.6s ease; }
+.pt-meta { display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--text-muted); }
+
+/* ── TOASTS ── */
+.toast-container {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 99999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+}
+.toast {
+  background: var(--text);
+  color: var(--bg);
+  padding: 10px 20px;
+  border-radius: 50px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  animation: toastIn 0.35s cubic-bezier(0.16,1,0.3,1) both;
+  pointer-events: all;
+}
+@keyframes toastIn {
+  from { opacity: 0; transform: translateY(20px) scale(0.9); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.toast.out { animation: toastOut 0.3s ease forwards; }
+@keyframes toastOut {
+  to { opacity: 0; transform: translateY(-10px) scale(0.95); }
+}
+
+/* Fade up utility */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .rh-hero { padding: 110px 5% 40px; }
+  .rh-hero-title { font-size: 2rem; }
+  .rh-modal { height: 100vh; max-height: 100vh; border-radius: 0; }
+  .modal-tabs { overflow-x: auto; }
+  .video-grid { grid-template-columns: 1fr; }
+  .notes-grid { grid-template-columns: 1fr; }
+  .progress-tracker { right: 16px; bottom: 16px; min-width: 180px; }
+}
+
+/* ── EMPTY SUBJECT STATE ── */
+.empty-subjects {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 80px 20px;
+}
+.empty-subjects-emoji { font-size: 3.5rem; margin-bottom: 16px; }
+.empty-subjects-title { font-family: 'Syne', sans-serif; font-size: 1.3rem; font-weight: 700; color: var(--text); margin-bottom: 10px; }
+.empty-subjects-desc { font-size: 0.88rem; color: var(--text-muted); max-width: 380px; margin: 0 auto 24px; line-height: 1.6; }
+
+/* Tab 4 — AI learning path tab */
+.ai-path-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+</style>
+</head>
+<body>
+
+<div class="bg-mesh"></div>
+
+<!-- ════════════════════════════════════
+     BACK BAR — replaces full navbar
+════════════════════════════════════ -->
+<style>
+.rh-back-bar{position:fixed;top:0;left:0;right:0;z-index:800;display:flex;align-items:center;justify-content:space-between;padding:0 5%;height:58px;background:color-mix(in srgb,var(--bg) 82%,transparent);border-bottom:1px solid var(--surface-border);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);}
+.rh-back-btn{display:inline-flex;align-items:center;gap:8px;font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:600;color:var(--text-muted);text-decoration:none;padding:7px 18px;border:1px solid var(--surface-border);border-radius:50px;background:var(--surface);transition:color .2s,border-color .2s,background .2s,transform .2s;}
+.rh-back-btn:hover{color:var(--primary);border-color:var(--primary);background:var(--primary-light);transform:translateX(-3px);}
+.rh-bar-center{font-family:'Syne',sans-serif;font-size:.95rem;font-weight:700;color:var(--text);}
+.rh-bar-user{font-size:.8rem;color:var(--text-muted);font-weight:500;}
+</style>
+<div class="rh-back-bar">
+  <a href="dashboard.html" class="rh-back-btn">← Back to Dashboard</a>
+  <div class="rh-bar-center">✦ Resource Hub</div>
+  <div class="rh-bar-user" id="barUser"></div>
+</div>
+
+<!-- ════════════════════════════════════
+     HERO
+════════════════════════════════════ -->
+<section class="rh-hero">
+  <div class="rh-hero-inner">
+    <div class="rh-eyebrow">✦ AI-Powered Resource Hub</div>
+    <h1 class="rh-hero-title">
+      Find Every Resource<br>
+      You Need to <span class="grad">Master Any Subject.</span>
+    </h1>
+    <p class="rh-hero-sub">
+      Videos, notes, PDFs, and top websites — curated by AI, personalized to your syllabus. Stop searching, start learning.
+    </p>
+    <div class="rh-stats">
+      <div class="rh-stat">
+        <div class="rh-stat-num" id="statSubjects">0</div>
+        <div class="rh-stat-label">Your Subjects</div>
+      </div>
+      <div class="rh-stat">
+        <div class="rh-stat-num">500+</div>
+        <div class="rh-stat-label">Curated Resources</div>
+      </div>
+      <div class="rh-stat">
+        <div class="rh-stat-num">AI</div>
+        <div class="rh-stat-label">Recommendations</div>
+      </div>
+      <div class="rh-stat">
+        <div class="rh-stat-num" id="statBookmarks">0</div>
+        <div class="rh-stat-label">Bookmarked</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════
+     SUBJECT CARDS
+════════════════════════════════════ -->
+<div class="rh-section">
+  <div class="rh-section-head">
+    <div>
+      <span class="section-label">Your Curriculum</span>
+      <h2>Browse by Subject</h2>
+    </div>
+    <div class="rh-search-wrap">
+      <span class="rh-search-icon">🔍</span>
+      <input type="text" placeholder="Search subjects..." id="subjectSearch" oninput="filterSubjects(this.value)">
+    </div>
+  </div>
+  <div class="subject-grid" id="subjectGrid">
+    <!-- JS renders subject cards here -->
+  </div>
+</div>
+
+<!-- ════════════════════════════════════
+     RESOURCE MODAL
+════════════════════════════════════ -->
+<div class="rh-modal-overlay" id="resourceModal" onclick="if(event.target===this)closeModal()">
+  <div class="rh-modal">
+    <div class="modal-header">
+      <div class="modal-header-top">
+        <div class="modal-subject-info">
+          <span class="modal-emoji" id="modalEmoji">📚</span>
+          <div>
+            <div class="modal-subject-name" id="modalSubjectName">Subject</div>
+            <div class="modal-subject-sub" id="modalSubjectSub">Loading resources…</div>
+          </div>
+        </div>
+        <button class="modal-close" onclick="closeModal()">✕</button>
+      </div>
+      <div class="modal-tabs">
+        <button class="modal-tab active" onclick="switchTab('videos')" id="tab-videos">
+          ▶ Videos <span class="tab-count" id="cnt-videos">0</span>
+        </button>
+        <button class="modal-tab" onclick="switchTab('web')" id="tab-web">
+          🌐 Web Refs <span class="tab-count" id="cnt-web">0</span>
+        </button>
+        <button class="modal-tab" onclick="switchTab('notes')" id="tab-notes">
+          📄 Toppers Notes <span class="tab-count" id="cnt-notes">0</span>
+        </button>
+        <button class="modal-tab" onclick="switchTab('aipath')" id="tab-aipath">
+          ✦ AI Path
+        </button>
+      </div>
+    </div>
+
+    <div class="modal-body">
+      <!-- VIDEOS TAB -->
+      <div class="tab-panel active" id="panel-videos">
+        <div class="ai-banner" id="videosAiBanner" style="display:none">
+          <div class="ai-banner-icon">✦</div>
+          <div class="ai-banner-content">
+            <div class="ai-banner-title">AI Recommendation</div>
+            <div class="ai-banner-text" id="videosAiText">Analyzing videos for you…</div>
+          </div>
+          <button class="ai-regen-btn" onclick="regenAI('videos')" id="videosAiBtn">↻ Refresh</button>
+        </div>
+        <div class="resource-section-title">📺 Recommended Videos</div>
+        <div class="video-grid" id="videoGrid">
+          <!-- skeleton -->
+          <div class="skeleton-card"><div class="skeleton skeleton-thumb"></div><div class="skeleton skeleton-line wide"></div><div class="skeleton skeleton-line medium"></div><div class="skeleton skeleton-line short"></div></div>
+          <div class="skeleton-card"><div class="skeleton skeleton-thumb"></div><div class="skeleton skeleton-line wide"></div><div class="skeleton skeleton-line medium"></div><div class="skeleton skeleton-line short"></div></div>
+          <div class="skeleton-card"><div class="skeleton skeleton-thumb"></div><div class="skeleton skeleton-line wide"></div><div class="skeleton skeleton-line medium"></div><div class="skeleton skeleton-line short"></div></div>
+        </div>
+      </div>
+
+      <!-- WEB REFERENCES TAB -->
+      <div class="tab-panel" id="panel-web">
+        <div class="ai-banner" id="webAiBanner" style="display:none">
+          <div class="ai-banner-icon">🌐</div>
+          <div class="ai-banner-content">
+            <div class="ai-banner-title">Best Learning Sites</div>
+            <div class="ai-banner-text" id="webAiText">AI is curating the best websites…</div>
+          </div>
+          <button class="ai-regen-btn" onclick="regenAI('web')" id="webAiBtn">↻ Refresh</button>
+        </div>
+        <div class="resource-section-title">🏆 Top Learning Websites</div>
+        <div class="webref-grid" id="webGrid">
+          <div class="skeleton-card" style="height:72px;margin-bottom:0"></div>
+          <div class="skeleton-card" style="height:72px;margin-bottom:0"></div>
+          <div class="skeleton-card" style="height:72px;margin-bottom:0"></div>
+          <div class="skeleton-card" style="height:72px;margin-bottom:0"></div>
+        </div>
+      </div>
+
+      <!-- NOTES TAB -->
+      <div class="tab-panel" id="panel-notes">
+        <div class="ai-banner" id="notesAiBanner" style="display:none">
+          <div class="ai-banner-icon">📄</div>
+          <div class="ai-banner-content">
+            <div class="ai-banner-title">Topper-Curated Notes</div>
+            <div class="ai-banner-text" id="notesAiText">Finding the best study notes…</div>
+          </div>
+          <button class="ai-regen-btn" onclick="regenAI('notes')" id="notesAiBtn">↻ Refresh</button>
+        </div>
+        <div class="resource-section-title">📚 Study Notes & PDFs</div>
+        <div class="notes-grid" id="notesGrid">
+          <div class="skeleton-card" style="height:180px"></div>
+          <div class="skeleton-card" style="height:180px"></div>
+          <div class="skeleton-card" style="height:180px"></div>
+        </div>
+      </div>
+
+      <!-- AI PATH TAB -->
+      <div class="tab-panel" id="panel-aipath">
+        <div class="ai-banner">
+          <div class="ai-banner-icon">🧠</div>
+          <div class="ai-banner-content">
+            <div class="ai-banner-title">Personalized Learning Path</div>
+            <div class="ai-banner-text" id="pathAiText">AI is building your optimal study roadmap…</div>
+          </div>
+          <button class="ai-regen-btn" onclick="regenAI('path')" id="pathAiBtn">↻ Regenerate</button>
+        </div>
+        <div class="learning-path">
+          <div class="lp-title">🗺️ Your Study Roadmap</div>
+          <div class="lp-steps" id="lpSteps">
+            <div style="text-align:center;padding:30px;color:var(--text-muted);font-size:0.85rem;">Generating your personalized path…</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════
+     FLOATING PROGRESS TRACKER
+════════════════════════════════════ -->
+<div class="progress-tracker" id="progressTracker">
+  <div class="pt-title">📊 Study Progress</div>
+  <div class="pt-subject" id="ptSubject">—</div>
+  <div class="pt-bar"><div class="pt-fill" id="ptFill" style="width:0%"></div></div>
+  <div class="pt-meta">
+    <span id="ptViewed">0 resources viewed</span>
+    <span id="ptPct">0%</span>
+  </div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ════════════════════════════════════
+     FOOTER
+════════════════════════════════════ -->
+<footer class="premium-footer">
+  <div class="footer-top-divider"></div>
+  <div class="footer-container grid-4-col">
+    <div class="footer-brand">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+        <img src="logo.png" alt="StudyBuddy" style="height:44px;object-fit:contain;">
+        <h2 class="footer-logo" style="margin:0;">StudyBuddy</h2>
+      </div>
+      <p class="footer-desc">Your intelligent academic companion. Track progress, improve performance, and stay inspired.</p>
+      <div class="footer-socials">
+        <a href="#" aria-label="Github"><svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg></a>
+        <a href="#" aria-label="LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v-1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg></a>
+      </div>
+    </div>
+    <div class="footer-links-col">
+      <h4 class="footer-title">Platform</h4>
+      <ul class="footer-list">
+        <li><a href="dashboard.html">Dashboard</a></li>
+        <li><a href="analytics.html">Analytics</a></li>
+        <li><a href="compiler.html">AI Code Lab</a></li>
+        <li><a href="quiz.html">AI Quiz</a></li>
+        <li><a href="resources.html">Resource Hub</a></li>
+      </ul>
+    </div>
+    <div class="footer-links-col">
+      <h4 class="footer-title">Resources</h4>
+      <ul class="footer-list">
+        <li><a href="#">Help & Docs</a></li>
+        <li><a href="#">Privacy Policy</a></li>
+        <li><a href="#">Terms of Service</a></li>
+        <li><a href="#">Contact Us</a></li>
+      </ul>
+    </div>
+    <div class="footer-subscribe">
+      <h4 class="footer-title">Stay Updated</h4>
+      <p class="footer-desc">Get the latest AI study hacks.</p>
+      <div class="subscribe-input-group">
+        <input type="email" placeholder="you@email.com" class="sub-input" aria-label="Email Address">
+        <button class="sub-btn">Subscribe</button>
+      </div>
+      <span class="sub-note">No spam, ever.</span>
+    </div>
+  </div>
+  <div class="footer-bottom glass-bottom">
+    <div class="footer-bottom-flex">
+      <span>© <span id="currentYear"></span> StudyBuddy &nbsp;</span>
+      <span class="built-with"> Built with ❤️ by Krishna | Akshat | Mokshika | Khwaish</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ════════════════════════════════════
+     JAVASCRIPT
+════════════════════════════════════ -->
+<script>
+/* ── CONSTANTS ── */
+/* ══════════════════════════════════
+   API KEYS & CONFIG
+══════════════════════════════════ */
+const YOUTUBE_API_KEY = 'AIzaSyB1ilEQ5oYyeH-JZ4W1M3LNd0gjLoTwC54';
+const GROQ_KEY        = localStorage.getItem('groqApiKey') || 'YOUR_GROQ_KEY';
+const CACHE_TTL       = 1000 * 60 * 60 * 24; // 24 hours
+
+/* ── SUBJECT DATA (with fallbacks) ── */
+const SUBJECT_CONFIGS = {
+  'c':         { emoji:'💻', color:'#059669', chip:'CS Core',  desc:'Pointers, memory management, data structures and algorithms in C.', glow:'rgba(5,150,105,0.1)', trending:true },
+  'ai':        { emoji:'🤖', color:'#6366f1', chip:'AI/ML',    desc:'Fuzzy logic, neural networks, genetic algorithms & soft computing.', glow:'rgba(99,102,241,0.1)' },
+  'fe':        { emoji:'🌐', color:'#06b6d4', chip:'Web Dev',  desc:'JavaScript fundamentals, DOM, async/await, and Git workflows.', glow:'rgba(6,182,212,0.1)' },
+  'os':        { emoji:'🐧', color:'#f59e0b', chip:'Systems',  desc:'Process management, scheduling, virtual memory, and file systems.', glow:'rgba(245,158,11,0.1)' },
+  'math':      { emoji:'📐', color:'#ef4444', chip:'Core',     desc:'Calculus, linear algebra, probability and discrete mathematics.', glow:'rgba(239,68,68,0.1)' },
+  'dbms':      { emoji:'🗄️', color:'#8b5cf6', chip:'Database', desc:'Relational models, SQL, normalization and query optimization.', glow:'rgba(139,92,246,0.1)' },
+  'networks':  { emoji:'🔗', color:'#10b981', chip:'Networks', desc:'TCP/IP, OSI model, routing protocols and network security.', glow:'rgba(16,185,129,0.1)' },
+  'python':    { emoji:'🐍', color:'#eab308', chip:'Lang',     desc:'Python programming, OOP, libraries, and scripting.', glow:'rgba(234,179,8,0.1)' },
+  'default':   { emoji:'📚', color:'#059669', chip:'Subject',  desc:'Curated resources, videos, and notes for this subject.', glow:'rgba(5,150,105,0.1)' },
+};
+
+/* ── FALLBACK RESOURCE DATA ── */
+const FALLBACK_DATA = {
+  videos: {
+    'c': [
+      { id:'KJgsSFOSQv0', title:'C Programming Full Course for Beginners', channel:'freeCodeCamp.org', views:'8.2M', duration:'3:46:13', thumb:'https://img.youtube.com/vi/KJgsSFOSQv0/hqdefault.jpg', url:'https://www.youtube.com/watch?v=KJgsSFOSQv0' },
+      { id:'87SH2Cn0s9A', title:'Pointers in C - Full Tutorial', channel:'CS50', views:'4.1M', duration:'1:02:50', thumb:'https://img.youtube.com/vi/87SH2Cn0s9A/hqdefault.jpg', url:'https://www.youtube.com/watch?v=87SH2Cn0s9A' },
+      { id:'qP8kir2GUgo', title:'Memory Management in C Explained', channel:'Jacob Sorber', views:'1.8M', duration:'22:40', thumb:'https://img.youtube.com/vi/qP8kir2GUgo/hqdefault.jpg', url:'https://www.youtube.com/watch?v=qP8kir2GUgo' },
+      { id:'ZSPZob_1TOk', title:'Data Structures in C - Full Course', channel:'freeCodeCamp.org', views:'5.6M', duration:'9:31:41', thumb:'https://img.youtube.com/vi/ZSPZob_1TOk/hqdefault.jpg', url:'https://www.youtube.com/watch?v=ZSPZob_1TOk' },
+      { id:'1W4T2o_YFOI', title:'C Functions Deep Dive & Recursion', channel:'Neso Academy', views:'2.3M', duration:'18:24', thumb:'https://img.youtube.com/vi/1W4T2o_YFOI/hqdefault.jpg', url:'https://www.youtube.com/watch?v=1W4T2o_YFOI' },
+      { id:'zuegQmMdy8M', title:'File Handling in C Complete Guide', channel:'CodeWithHarry', views:'3.1M', duration:'45:00', thumb:'https://img.youtube.com/vi/zuegQmMdy8M/hqdefault.jpg', url:'https://www.youtube.com/watch?v=zuegQmMdy8M' },
+    ],
+    'ai': [
+      { id:'aircAruvnKk', title:'Neural Networks from Scratch (3Blue1Brown)', channel:'3Blue1Brown', views:'14M', duration:'19:13', thumb:'https://img.youtube.com/vi/aircAruvnKk/hqdefault.jpg', url:'https://www.youtube.com/watch?v=aircAruvnKk' },
+      { id:'9zKuYvjFFS8', title:'Backpropagation Calculus Explained', channel:'3Blue1Brown', views:'5.2M', duration:'10:47', thumb:'https://img.youtube.com/vi/9zKuYvjFFS8/hqdefault.jpg', url:'https://www.youtube.com/watch?v=9zKuYvjFFS8' },
+      { id:'dQw4w9WgXcQ', title:'Genetic Algorithms - Crash Course', channel:'TechWithTim', views:'1.1M', duration:'28:00', thumb:'https://img.youtube.com/vi/dQw4w9WgXcQ/hqdefault.jpg', url:'https://www.youtube.com/watch?v=dQw4w9WgXcQ' },
+      { id:'Gv9_4yMHFhI', title:'Fuzzy Logic Full Course', channel:'Neso Academy', views:'2.8M', duration:'1:10:00', thumb:'https://img.youtube.com/vi/Gv9_4yMHFhI/hqdefault.jpg', url:'https://www.youtube.com/watch?v=Gv9_4yMHFhI' },
+    ],
+    'fe': [
+      { id:'PkZNo7MFNFg', title:'JavaScript Full Course for Beginners', channel:'freeCodeCamp.org', views:'12M', duration:'3:26:42', thumb:'https://img.youtube.com/vi/PkZNo7MFNFg/hqdefault.jpg', url:'https://www.youtube.com/watch?v=PkZNo7MFNFg' },
+      { id:'jS4aFq5-91M', title:'DOM Manipulation Masterclass', channel:'Traversy Media', views:'4.4M', duration:'42:59', thumb:'https://img.youtube.com/vi/jS4aFq5-91M/hqdefault.jpg', url:'https://www.youtube.com/watch?v=jS4aFq5-91M' },
+      { id:'DHvZLI7Mgd8', title:'Async JS, Promises & Fetch API', channel:'The Coding Train', views:'2.9M', duration:'52:10', thumb:'https://img.youtube.com/vi/DHvZLI7Mgd8/hqdefault.jpg', url:'https://www.youtube.com/watch?v=DHvZLI7Mgd8' },
+      { id:'RGOj5yH7evk', title:'Git & GitHub Full Tutorial for Beginners', channel:'freeCodeCamp.org', views:'6.1M', duration:'1:08:00', thumb:'https://img.youtube.com/vi/RGOj5yH7evk/hqdefault.jpg', url:'https://www.youtube.com/watch?v=RGOj5yH7evk' },
+    ],
+    'os': [
+      { id:'bkSWJJZNgf8', title:'Operating Systems: Full Course', channel:'Gate Smashers', views:'3.4M', duration:'8:22:00', thumb:'https://img.youtube.com/vi/bkSWJJZNgf8/hqdefault.jpg', url:'https://www.youtube.com/watch?v=bkSWJJZNgf8' },
+      { id:'_h30HBYxtws', title:'Linux Command Line Crash Course', channel:'Traversy Media', views:'4.8M', duration:'1:12:16', thumb:'https://img.youtube.com/vi/_h30HBYxtws/hqdefault.jpg', url:'https://www.youtube.com/watch?v=_h30HBYxtws' },
+      { id:'26QPDBe-NB8', title:"Banker's Algorithm Explained", channel:'Neso Academy', views:'1.2M', duration:'28:50', thumb:'https://img.youtube.com/vi/26QPDBe-NB8/hqdefault.jpg', url:'https://www.youtube.com/watch?v=26QPDBe-NB8' },
+      { id:'7J9PkCvD5_8', title:'Process Scheduling Algorithms', channel:'Gate Smashers', views:'2.1M', duration:'56:40', thumb:'https://img.youtube.com/vi/7J9PkCvD5_8/hqdefault.jpg', url:'https://www.youtube.com/watch?v=7J9PkCvD5_8' },
+    ],
+    'default': [
+      { id:'dD2EISBDjWM', title:'How to Study Effectively (Evidence-Based)', channel:'Thomas Frank', views:'9.8M', duration:'13:45', thumb:'https://img.youtube.com/vi/dD2EISBDjWM/hqdefault.jpg', url:'https://www.youtube.com/watch?v=dD2EISBDjWM' },
+      { id:'Z-zNHHpXoMM', title:'Active Recall & Spaced Repetition', channel:'Mike and Matty', views:'3.2M', duration:'11:20', thumb:'https://img.youtube.com/vi/Z-zNHHpXoMM/hqdefault.jpg', url:'https://www.youtube.com/watch?v=Z-zNHHpXoMM' },
+    ]
+  },
+  web: {
+    'c': [
+      { title:'GeeksforGeeks — C Programming', desc:'Comprehensive tutorials, MCQs, and practice problems on all C topics', url:'https://www.geeksforgeeks.org/c-programming-language/', favicon:'🟢', domain:'geeksforgeeks.org', badge:'free' },
+      { title:'Programiz — Learn C', desc:'Clear, beginner-friendly lessons with interactive examples', url:'https://www.programiz.com/c-programming', favicon:'🔷', domain:'programiz.com', badge:'free' },
+      { title:'TutorialsPoint — C Language', desc:'Deep-dive reference with examples for every C concept', url:'https://www.tutorialspoint.com/cprogramming', favicon:'🟡', domain:'tutorialspoint.com', badge:'free' },
+      { title:'CS50 Harvard — C Unit', desc:"Harvard's world-renowned intro CS course — free with certificate", url:'https://cs50.harvard.edu/x', favicon:'🔴', domain:'cs50.harvard.edu', badge:'free' },
+      { title:'Beej\'s Guide to C Programming', desc:'The internet\'s best free C reference book, loved by professionals', url:'https://beej.us/guide/bgc/', favicon:'📘', domain:'beej.us', badge:'free' },
+    ],
+    'ai': [
+      { title:'Towards Data Science', desc:'Top AI/ML articles, tutorials, and research breakdowns', url:'https://towardsdatascience.com', favicon:'📊', domain:'towardsdatascience.com', badge:'free' },
+      { title:'Neural Networks & Deep Learning (Nielsen)', desc:'Free interactive book on neural networks with visual intuition', url:'http://neuralnetworksanddeeplearning.com', favicon:'🧠', domain:'neuralnetworksanddeeplearning.com', badge:'free' },
+      { title:'NPTEL — Soft Computing', desc:'IIT-quality lecture slides and assignments on fuzzy logic & GA', url:'https://nptel.ac.in/courses/106105210', favicon:'🎓', domain:'nptel.ac.in', badge:'free' },
+      { title:'Coursera — AI for Everyone (Andrew Ng)', desc:'Build AI intuition with the godfather of ML', url:'https://www.coursera.org/learn/ai-for-everyone', favicon:'📚', domain:'coursera.org', badge:'pro' },
+    ],
+    'fe': [
+      { title:'MDN Web Docs — JavaScript', desc:"Mozilla's authoritative JS reference — the gold standard for web devs", url:'https://developer.mozilla.org/en-US/docs/Web/JavaScript', favicon:'🦊', domain:'developer.mozilla.org', badge:'free' },
+      { title:'javascript.info', desc:'The modern JavaScript tutorial — comprehensive and beautifully written', url:'https://javascript.info', favicon:'💛', domain:'javascript.info', badge:'free' },
+      { title:'The Odin Project', desc:'Full-stack curriculum with hands-on JS projects', url:'https://www.theodinproject.com', favicon:'⚔️', domain:'theodinproject.com', badge:'free' },
+      { title:'CSS-Tricks', desc:'Frontend tips, tricks, and deep dives on CSS and JS', url:'https://css-tricks.com', favicon:'🎨', domain:'css-tricks.com', badge:'free' },
+    ],
+    'os': [
+      { title:'GeeksforGeeks — Operating Systems', desc:'Complete OS coverage with GATE-level questions and explanations', url:'https://www.geeksforgeeks.org/operating-systems/', favicon:'🟢', domain:'geeksforgeeks.org', badge:'free' },
+      { title:'OSTEP — Three Easy Pieces', desc:'Free book: Operating Systems: Three Easy Pieces — used in top universities', url:'https://pages.cs.wisc.edu/~remzi/OSTEP/', favicon:'📗', domain:'ostep.org', badge:'free' },
+      { title:'Linux Journey', desc:'Interactive Linux command-line learning from basics to advanced', url:'https://linuxjourney.com', favicon:'🐧', domain:'linuxjourney.com', badge:'free' },
+      { title:'Gate Smashers — OS Playlist', desc:'Best GATE-oriented OS video series for Indian university students', url:'https://www.youtube.com/@GateSmashers', favicon:'🎯', domain:'youtube.com', badge:'free' },
+    ],
+    'default': [
+      { title:'Khan Academy', desc:'Free world-class education — math, science, computing and more', url:'https://www.khanacademy.org', favicon:'🟦', domain:'khanacademy.org', badge:'free' },
+      { title:'MIT OpenCourseWare', desc:"MIT's free lecture notes, exams, and videos from all courses", url:'https://ocw.mit.edu', favicon:'🏛️', domain:'ocw.mit.edu', badge:'free' },
+      { title:'Coursera', desc:'Courses from top universities — audit free or earn a certificate', url:'https://www.coursera.org', favicon:'📘', domain:'coursera.org', badge:'pro' },
+    ]
+  },
+  notes: {
+    'c': [
+      { title:'C Programming Complete Guide', type:'web', source:'GeeksforGeeks', size:'Web page', url:'https://www.geeksforgeeks.org/c-programming-language/', description:'Full C language reference with examples from basics to advanced.' },
+      { title:'C Programming Tutorials', type:'web', source:'Tutorialspoint', size:'Web page', url:'https://www.tutorialspoint.com/cprogramming/index.htm', description:'Comprehensive C tutorials with code examples and explanations.' },
+      { title:'Learn C Programming', type:'web', source:'Programiz', size:'Web page', url:'https://www.programiz.com/c-programming', description:'Beginner-friendly C tutorials with interactive examples.' },
+      { title:'Pointers in C — Full Guide', type:'web', source:'GeeksforGeeks', size:'Web page', url:'https://www.geeksforgeeks.org/pointers-in-c-and-c-plus-plus/', description:'Everything about pointers, memory, and dynamic allocation in C.' },
+      { title:'MIT OCW — Practical C Programming', type:'web', source:'MIT OpenCourseWare', size:'Web page', url:'https://ocw.mit.edu/courses/6-087-practical-programming-in-c-january-iap-2010/', description:'MIT lecture notes, assignments and exams for C programming.' },
+      { title:'NPTEL C Programming Course', type:'web', source:'NPTEL', size:'Web page', url:'https://nptel.ac.in/courses/106105085', description:'IIT lecture series covering all C programming fundamentals.' },
+      { title:'C Language — JavaTpoint', type:'web', source:'JavaTpoint', size:'Web page', url:'https://www.javatpoint.com/c-programming-language-tutorial', description:'Step-by-step C programming from variables to file handling.' },
+    ],
+    'ai': [
+      { title:'Stanford CS221 — Intro to AI', type:'web', source:'Stanford University', size:'Web page', url:'https://stanford-cs221.github.io/autumn2023/', description:'Stanford AI course slides, notes and assignments.' },
+      { title:'AI Algorithms — GeeksforGeeks', type:'web', source:'GeeksforGeeks', size:'Web page', url:'https://www.geeksforgeeks.org/artificial-intelligence/', description:'AI concepts, search algorithms, and soft computing.' },
+      { title:'NPTEL Artificial Intelligence', type:'web', source:'NPTEL', size:'Web page', url:'https://nptel.ac.in/courses/106105078', description:'IIT lecture series covering AI fundamentals and applications.' },
+      { title:'ML for Beginners — freeCodeCamp', type:'web', source:'freeCodeCamp', size:'Web page', url:'https://www.freecodecamp.org/news/tag/machine-learning/', description:'Practical ML and neural network tutorials with code.' },
+      { title:'Neural Networks — 3Blue1Brown', type:'web', source:'3Blue1Brown', size:'Web page', url:'https://www.3blue1brown.com/topics/neural-networks', description:'Visual intuition for neural networks and deep learning.' },
+      { title:'Fuzzy Logic Guide — Tutorialspoint', type:'web', source:'Tutorialspoint', size:'Web page', url:'https://www.tutorialspoint.com/fuzzy_logic/index.htm', description:'Complete fuzzy logic tutorial with examples and applications.' },
+    ],
+    'fe': [
+      { title:'MDN Web Docs — Learn Web Dev', type:'web', source:'MDN Web Docs', size:'Web page', url:'https://developer.mozilla.org/en-US/docs/Learn', description:'Mozilla official learning path for HTML, CSS, and JavaScript.' },
+      { title:'The Modern JavaScript Tutorial', type:'web', source:'javascript.info', size:'Web page', url:'https://javascript.info/', description:'Modern JS from basics to advanced with exercises.' },
+      { title:'ES6 Cheat Sheet', type:'web', source:'devhints.io', size:'Web page', url:'https://devhints.io/es6', description:'Quick reference for all modern JavaScript ES6+ features.' },
+      { title:'CSS Flexbox Guide', type:'web', source:'CSS-Tricks', size:'Web page', url:'https://css-tricks.com/snippets/css/a-guide-to-flexbox/', description:'Visual guide to CSS Flexbox with interactive examples.' },
+      { title:'freeCodeCamp Web Design', type:'web', source:'freeCodeCamp', size:'Web page', url:'https://www.freecodecamp.org/learn/2022/responsive-web-design/', description:'Free responsive web design certification course.' },
+      { title:'W3Schools HTML Reference', type:'web', source:'W3Schools', size:'Web page', url:'https://www.w3schools.com/html/', description:'Complete HTML reference with try-it-yourself examples.' },
+    ],
+    'os': [
+      { title:'Operating Systems — GeeksforGeeks', type:'web', source:'GeeksforGeeks', size:'Web page', url:'https://www.geeksforgeeks.org/operating-systems/', description:'Complete OS notes: scheduling, memory management, deadlocks.' },
+      { title:'OS Concepts — Tutorialspoint', type:'web', source:'Tutorialspoint', size:'Web page', url:'https://www.tutorialspoint.com/operating_system/index.htm', description:'Structured OS tutorials with diagrams and examples.' },
+      { title:'Linux Journey — Interactive Learning', type:'web', source:'Linux Journey', size:'Web page', url:'https://linuxjourney.com/', description:'Learn Linux commands interactively from beginner to advanced.' },
+      { title:'NPTEL Operating Systems', type:'web', source:'NPTEL', size:'Web page', url:'https://nptel.ac.in/courses/106105214', description:'IIT lecture series on OS principles and Linux internals.' },
+      { title:'MIT OCW — OS Engineering', type:'web', source:'MIT OpenCourseWare', size:'Web page', url:'https://ocw.mit.edu/courses/6-828-operating-system-engineering-fall-2012/', description:'MIT OS course with lecture notes and xv6 labs.' },
+      { title:'Linux Command Reference', type:'web', source:'SS64', size:'Web page', url:'https://ss64.com/bash/', description:'Complete A-Z Bash and Linux command reference guide.' },
+    ],
+    'default': [
+      { title:'MIT OpenCourseWare', type:'web', source:'MIT', size:'Web page', url:'https://ocw.mit.edu', description:'Free MIT lecture notes, exams, and videos for all subjects.' },
+      { title:'NPTEL Online Courses', type:'web', source:'NPTEL', size:'Web page', url:'https://nptel.ac.in', description:'Free IIT/IISc lecture series for engineering subjects.' },
+      { title:'Khan Academy', type:'web', source:'Khan Academy', size:'Web page', url:'https://www.khanacademy.org', description:'Free courses on math, science, computing and more.' },
+      { title:'GeeksforGeeks', type:'web', source:'GeeksforGeeks', size:'Web page', url:'https://www.geeksforgeeks.org', description:'CS concepts, tutorials and interview preparation.' },
+      { title:'freeCodeCamp', type:'web', source:'freeCodeCamp', size:'Web page', url:'https://www.freecodecamp.org', description:'Free coding courses and developer certifications.' },
+    ]
+  }
+};
+
+/* ── LEARNING PATHS ── */
+const LEARNING_PATHS = {
+  'c': [
+    { title:'Set up your C environment', desc:'Install GCC, configure VS Code, run your first Hello World.', tag:'Setup', done:false },
+    { title:'Master data types & operators', desc:'Practice all primitive types, type casting, and operator precedence.', tag:'Week 1', done:false },
+    { title:'Control flow & loops', desc:'Build 10 programs using if/else, switch, for, while, and do-while.', tag:'Week 1', done:false },
+    { title:'Functions & recursion', desc:'Write recursive functions — factorial, Fibonacci, binary search.', tag:'Week 2', done:false },
+    { title:'Arrays, strings & pointers', desc:'Deeply understand memory addresses, pointer arithmetic, and array decay.', tag:'Week 2', done:false },
+    { title:'Dynamic memory allocation', desc:'Practice malloc, calloc, realloc, free — and detect memory leaks.', tag:'Week 3', done:false },
+    { title:'Structs, unions & file I/O', desc:'Build a student record system using structs and file handling.', tag:'Week 4', done:false },
+  ],
+  'ai': [
+    { title:'Understand hard vs soft computing', desc:'Read the intro chapter, watch 3Blue1Brown\'s neural network intro.', tag:'Day 1', done:false },
+    { title:'Fuzzy sets & membership functions', desc:'Solve 20 membership function problems. Use MATLAB/Python fuzzy lib.', tag:'Week 1', done:false },
+    { title:'Fuzzy Inference System (FIS)', desc:'Build a Mamdani FIS for a simple control system.', tag:'Week 1', done:false },
+    { title:'Perceptron & Adaline', desc:'Implement both from scratch in Python. Understand gradient descent.', tag:'Week 2', done:false },
+    { title:'Backpropagation deep dive', desc:'Code a 2-layer neural network. Visualize weight updates.', tag:'Week 3', done:false },
+    { title:'Genetic Algorithm project', desc:'Solve the Traveling Salesman Problem using a custom GA.', tag:'Week 4', done:false },
+  ],
+  'fe': [
+    { title:'ES6+ JavaScript foundations', desc:'Master let/const, arrow functions, template literals, destructuring.', tag:'Week 1', done:false },
+    { title:'DOM manipulation mastery', desc:'Build 5 interactive UI components from scratch (modal, accordion, slider).', tag:'Week 2', done:false },
+    { title:'Events & closures deep dive', desc:'Understand event bubbling, delegation, and closure scopes.', tag:'Week 2', done:false },
+    { title:'Async JavaScript', desc:'Build an app using fetch, async/await, and handle errors gracefully.', tag:'Week 3', done:false },
+    { title:'Git workflow', desc:'Create a repo, use branches, pull requests, and resolve merge conflicts.', tag:'Week 3', done:false },
+    { title:'Capstone project', desc:'Build a full JavaScript web app and deploy it on GitHub Pages.', tag:'Week 4', done:false },
+  ],
+  'os': [
+    { title:'OS concepts & Linux setup', desc:'Install Ubuntu (WSL or VM), learn 20 essential terminal commands.', tag:'Week 1', done:false },
+    { title:'Process states & PCB', desc:'Draw process state diagrams, understand context switching.', tag:'Week 1', done:false },
+    { title:'CPU scheduling algorithms', desc:'Code FCFS, SJF, Priority, Round Robin. Calculate waiting/turnaround times.', tag:'Week 2', done:false },
+    { title:'Synchronization & deadlocks', desc:"Solve the Dining Philosophers problem. Implement Banker's Algorithm.", tag:'Week 3', done:false },
+    { title:'Virtual memory & paging', desc:'Simulate LRU, FIFO, Optimal page replacement. Calculate page faults.', tag:'Week 4', done:false },
+    { title:'File systems & disk scheduling', desc:'Compare FAT, NTFS, ext4. Implement SCAN and C-SCAN scheduling.', tag:'Week 4', done:false },
+  ],
+  'default': [
+    { title:'Understand the fundamentals', desc:'Watch 2 introductory videos and read the first chapter.', tag:'Day 1', done:false },
+    { title:'Practice problems (beginner)', desc:'Solve 10 beginner-level exercises to build intuition.', tag:'Week 1', done:false },
+    { title:'Deep dive on key concepts', desc:'Focus on the 3 most important topics. Make flashcards.', tag:'Week 2', done:false },
+    { title:'Past year questions', desc:'Solve last 3 years of exam questions. Review weak areas.', tag:'Week 3', done:false },
+    { title:'Mock test & revision', desc:'Take a timed mock test. Revise all notes. You are ready!', tag:'Week 4', done:false },
+  ]
+};
+
+/* ── STATE ── */
+let currentSubject = null;
+let allSubjects = [];
+let activeTab = 'videos';
+let bookmarkedCards = JSON.parse(localStorage.getItem('rh_bookmarks') || '[]');
+let viewedResources = JSON.parse(localStorage.getItem('rh_viewed') || '{}');
+let subjectProgress = JSON.parse(localStorage.getItem('rh_progress') || '{}');
+
+/* ── INIT ── */
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('currentYear').textContent = new Date().getFullYear();
+  loadUserProfile();
+  loadSubjects();
+  updateStats();
+});
+
+function startClock() {} // no-op — clock was in removed navbar
+
+function loadUserProfile() {
+  try {
+    // registration.html saves to sb_current_user (logged-in) or sb_user_profile (guest)
+    const user = JSON.parse(
+      localStorage.getItem('sb_current_user') ||
+      localStorage.getItem('sb_user_profile') || '{}'
+    );
+    if (user.name) {
+      const el = document.getElementById('barUser');
+      if (el) el.textContent = '👤 ' + user.name.split(' ')[0];
+    }
+  } catch(e) {}
+}
+
+function toggleProfile() {}
+document.addEventListener('click', () => {});
+
+function handleLogout() {
+  localStorage.removeItem('sb_current_user');
+  window.location.href = 'registration.html';
+}
+
+/* ── SUBJECT LOADING ── */
+function loadSubjects() {
+  const subjects = extractSubjectsFromStorage();
+  allSubjects = subjects;
+  renderSubjectGrid(subjects);
+  document.getElementById('statSubjects').textContent = subjects.length;
+}
+
+function extractSubjectsFromStorage() {
+  try {
+    // PRIMARY: sb_current_user.subjects — set by registration.html on login/register
+    const cu = JSON.parse(localStorage.getItem('sb_current_user') || 'null');
+    if (cu && Array.isArray(cu.subjects) && cu.subjects.length > 0) {
+      return cu.subjects.map(s => ({
+        key: s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),
+        name: s
+      }));
+    }
+    // FALLBACK: sb_user_profile.subjects — guest flow in registration.html
+    const up = JSON.parse(localStorage.getItem('sb_user_profile') || 'null');
+    if (up && Array.isArray(up.subjects) && up.subjects.length > 0) {
+      return up.subjects.map(s => ({
+        key: s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),
+        name: s
+      }));
+    }
+  } catch(e) { console.warn('Subject load error:', e); }
+
+  // Last resort — hardcoded subjects (shown only before registration is done)
+  return [
+    { key:'c',   name:'Fundamentals of C',      code:'24CSE0107', faculty:'Mr. Yogesh Bajpai',    credits:4 },
+    { key:'ai',  name:'Foundations of AI',       code:'25CAI0102', faculty:'Mr. Prabhjot Manocha', credits:3 },
+    { key:'fe',  name:'Front End Engineering',   code:'25CSE0105', faculty:'Mr. Sourabh Batra',    credits:3 },
+    { key:'os',  name:'OS & Linux Fundamentals', code:'25CSE0104', faculty:'Mr. Rahul Trivedi',    credits:3 },
+  ];
+}
+
+function renderSubjectGrid(subjects) {
+  const grid = document.getElementById('subjectGrid');
+  if (!subjects || subjects.length === 0) {
+    grid.innerHTML = `
+      <div class="empty-subjects">
+        <div class="empty-subjects-emoji">📚</div>
+        <div class="empty-subjects-title">No subjects found</div>
+        <div class="empty-subjects-desc">Complete your profile registration to see your subjects here, or subjects will appear automatically from your dashboard.</div>
+        <a href="registration.html" class="btn btn-primary" style="display:inline-block;padding:12px 28px;text-decoration:none;border-radius:12px;">Complete Profile →</a>
+      </div>`;
+    return;
+  }
+
+  grid.innerHTML = subjects.map((sub, idx) => {
+    const cfg = SUBJECT_CONFIGS[sub.key] || SUBJECT_CONFIGS['default'];
+    const bm = bookmarkedCards.includes(sub.key);
+    const prog = subjectProgress[sub.key] || 0;
+    return `
+    <div class="subject-card" 
+         style="--card-glow:${cfg.glow};--card-accent:${cfg.color};animation-delay:${idx * 0.08}s"
+         onclick="openSubjectModal('${sub.key}', '${escHtml(sub.name)}')">
+      ${cfg.trending ? `<div class="trending-badge">🔥 Trending</div>` : ''}
+      <button class="card-bookmark ${bm ? 'bookmarked' : ''}" 
+              onclick="event.stopPropagation();toggleBookmark('${sub.key}', this)"
+              title="${bm ? 'Remove bookmark' : 'Bookmark'}">
+        ${bm ? '★' : '☆'}
+      </button>
+      <span class="card-emoji">${cfg.emoji}</span>
+      <span class="card-chip" style="background:${cfg.color}1a;color:${cfg.color}">${cfg.chip}</span>
+      <div class="card-title">${escHtml(sub.name)}</div>
+      <div class="card-desc">${sub.code ? `<strong>${sub.code}</strong> · ${sub.faculty || ''}<br>` : ''}${cfg.desc}</div>
+      ${prog > 0 ? `
+      <div class="card-progress-wrap">
+        <div class="card-progress-label">
+          <span>Study Progress</span>
+          <span>${prog}%</span>
+        </div>
+        <div class="card-progress-bar">
+          <div class="card-progress-fill" style="width:${prog}%"></div>
+        </div>
+      </div>` : ''}
+      <div class="card-meta">
+        <div class="card-resources">
+          <span class="card-res-dot" style="background:${cfg.color}"></span>
+          ${sub.credits ? `${sub.credits} Credits · ` : ''}Videos + Notes
+        </div>
+        <div class="card-cta" style="color:${cfg.color}">
+          Explore →
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function filterSubjects(query) {
+  const q = query.toLowerCase().trim();
+  const filtered = q ? allSubjects.filter(s => 
+    s.name.toLowerCase().includes(q) || 
+    (s.code && s.code.toLowerCase().includes(q)) ||
+    (SUBJECT_CONFIGS[s.key]?.chip || '').toLowerCase().includes(q)
+  ) : allSubjects;
+  renderSubjectGrid(filtered);
+}
+
+function toggleBookmark(key, btn) {
+  const idx = bookmarkedCards.indexOf(key);
+  if (idx === -1) {
+    bookmarkedCards.push(key);
+    btn.textContent = '★';
+    btn.classList.add('bookmarked');
+    showToast('📌 Subject bookmarked!');
+  } else {
+    bookmarkedCards.splice(idx, 1);
+    btn.textContent = '☆';
+    btn.classList.remove('bookmarked');
+    showToast('Bookmark removed');
+  }
+  localStorage.setItem('rh_bookmarks', JSON.stringify(bookmarkedCards));
+  updateStats();
+}
+
+/* ── MODAL OPEN/CLOSE ── */
+async function openSubjectModal(key, name) {
+  currentSubject = { key, name };
+  document.getElementById('modalEmoji').textContent = (SUBJECT_CONFIGS[key] || SUBJECT_CONFIGS['default']).emoji;
+  document.getElementById('modalSubjectName').textContent = name;
+  document.getElementById('modalSubjectSub').textContent = 'Loading resources…';
+  
+  document.getElementById('resourceModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  
+  // Reset to videos tab
+  switchTab('videos');
+  
+  // Show skeleton loaders while fetching
+  showSkeletons();
+  
+  // Load all resources
+  await Promise.all([
+    loadVideos(key, name),
+    loadWebRefs(key, name),
+    loadNotes(key, name),
+  ]);
+  
+  loadLearningPath(key, name);
+  document.getElementById('modalSubjectSub').textContent = 'Curated resources powered by AI';
+  
+  // Show progress tracker
+  updateProgressTracker(key, name);
+}
+
+function closeModal() {
+  document.getElementById('resourceModal').classList.remove('open');
+  document.body.style.overflow = '';
+  setTimeout(() => { document.getElementById('progressTracker').classList.remove('visible'); }, 300);
+}
+
+function switchTab(tab) {
+  activeTab = tab;
+  document.querySelectorAll('.modal-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById(`tab-${tab}`)?.classList.add('active');
+  document.getElementById(`panel-${tab}`)?.classList.add('active');
+}
+
+/* ── SKELETON ── */
+function showSkeletons() {
+  document.getElementById('videoGrid').innerHTML = Array(6).fill(0).map(() => `
+    <div class="skeleton-card">
+      <div class="skeleton skeleton-thumb"></div>
+      <div class="skeleton skeleton-line wide"></div>
+      <div class="skeleton skeleton-line medium"></div>
+      <div class="skeleton skeleton-line short"></div>
+    </div>`).join('');
+  document.getElementById('webGrid').innerHTML = Array(4).fill(0).map(() => `
+    <div class="skeleton-card" style="height:80px;display:flex;gap:14px;padding:16px;margin-bottom:0">
+      <div class="skeleton skeleton-circle"></div>
+      <div style="flex:1"><div class="skeleton skeleton-line wide" style="margin-bottom:10px"></div><div class="skeleton skeleton-line short"></div></div>
+    </div>`).join('');
+  document.getElementById('notesGrid').innerHTML = Array(4).fill(0).map(() => `
+    <div class="skeleton-card" style="height:180px"></div>`).join('');
+}
+
+/* ── LOAD VIDEOS — YouTube Data API v3 (30 results) ── */
+async function loadVideos(key, name) {
+  const cacheKey = `rh_videos_${key}`;
+  const cached = getCache(cacheKey);
+  if (cached && cached.length > 0) {
+    document.getElementById('cnt-videos').textContent = cached.length;
+    renderVideos(cached, key);
+    fetchAIRecommendation('videos', name, cached);
+    return;
+  }
+
+  // Show loading state
+  document.getElementById('videoGrid').innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted);font-size:.9rem;">⏳ Fetching videos from YouTube…</div>`;
+
+  let videos = [];
+  try {
+    const query = encodeURIComponent(`${name} tutorial lecture`);
+    // Step 1: search for 30 video IDs
+    const searchRes = await fetch(
+      `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${query}&type=video&maxResults=30&relevanceLanguage=en&key=${YOUTUBE_API_KEY}`
+    );
+    if (!searchRes.ok) throw new Error(`Search failed: ${searchRes.status}`);
+    const searchJson = await searchRes.json();
+    const ids = (searchJson.items || []).map(i => i.id.videoId).filter(Boolean).join(',');
+
+    if (ids) {
+      // Step 2: get full details (duration + view count) for those IDs
+      const detailRes = await fetch(
+        `https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,statistics&id=${ids}&key=${YOUTUBE_API_KEY}`
+      );
+      if (!detailRes.ok) throw new Error(`Details failed: ${detailRes.status}`);
+      const detailJson = await detailRes.json();
+
+      videos = (detailJson.items || []).map(v => ({
+        id:       v.id,
+        title:    v.snippet.title,
+        channel:  v.snippet.channelTitle,
+        views:    formatViews(v.statistics?.viewCount),
+        duration: parseDuration(v.contentDetails?.duration || ''),
+        thumb:    v.snippet.thumbnails?.high?.url
+                  || v.snippet.thumbnails?.medium?.url
+                  || `https://img.youtube.com/vi/${v.id}/hqdefault.jpg`,
+        url:      `https://www.youtube.com/watch?v=${v.id}`
+      }));
+    }
+  } catch(e) {
+    console.warn('YouTube API error:', e);
+    // Fallback to hardcoded list on error
+    videos = FALLBACK_DATA.videos[key] || FALLBACK_DATA.videos['default'];
+    showToast('⚠️ YouTube API error — showing curated list');
+  }
+
+  if (videos.length === 0) {
+    videos = FALLBACK_DATA.videos[key] || FALLBACK_DATA.videos['default'];
+  }
+
+  setCache(cacheKey, videos);
+  document.getElementById('cnt-videos').textContent = videos.length;
+  renderVideos(videos, key);
+  fetchAIRecommendation('videos', name, videos);
+}
+
+/* helpers */
+function formatViews(n) {
+  if (!n) return '—';
+  const num = parseInt(n, 10);
+  if (num >= 1e9) return (num/1e9).toFixed(1)+'B';
+  if (num >= 1e6) return (num/1e6).toFixed(1)+'M';
+  if (num >= 1e3) return (num/1e3).toFixed(1)+'K';
+  return String(num);
+}
+function parseDuration(iso) {
+  if (!iso) return '—';
+  const m = iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+  if (!m) return '—';
+  const h=parseInt(m[1]||'0'), min=parseInt(m[2]||'0'), s=parseInt(m[3]||'0');
+  if (h>0) return `${h}:${String(min).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  return `${min}:${String(s).padStart(2,'0')}`;
+}
+
+function renderVideos(videos, key) {
+  const bms = JSON.parse(localStorage.getItem('rh_vid_bm') || '[]');
+  document.getElementById('videoGrid').innerHTML = videos.map((v, i) => `
+    <a class="video-card" href="${v.url}" target="_blank" rel="noopener"
+       onclick="trackView('${key}', 'video', ${i})" style="animation-delay:${i*0.05}s">
+      <div class="video-thumb-wrap">
+        <img class="video-thumb" src="${v.thumb}" alt="${escHtml(v.title)}" 
+             loading="lazy" onerror="this.src='https://placehold.co/320x180/1a1a2e/059669?text=▶'">
+        <div class="video-play-btn">
+          <div class="play-circle">▶</div>
+        </div>
+        <span class="video-duration">${v.duration || '—'}</span>
+      </div>
+      <div class="video-info">
+        <div class="video-title">${escHtml(v.title)}</div>
+        <div class="video-meta">
+          <div class="video-channel">
+            <div class="channel-dot">${v.channel.charAt(0)}</div>
+            ${escHtml(v.channel)}
+          </div>
+          <div class="video-views">👁 ${v.views}</div>
+        </div>
+        <div style="margin-top:10px;display:flex;justify-content:flex-end">
+          <button class="video-bm-btn ${bms.includes(v.id) ? 'saved' : ''}" 
+                  onclick="event.preventDefault();toggleVidBm('${v.id}', this)">
+            ${bms.includes(v.id) ? '★ Saved' : '☆ Save'}
+          </button>
+        </div>
+      </div>
+    </a>`).join('');
+  document.getElementById('videosAiBanner').style.display = 'flex';
+}
+
+function toggleVidBm(id, btn) {
+  const bms = JSON.parse(localStorage.getItem('rh_vid_bm') || '[]');
+  const idx = bms.indexOf(id);
+  if (idx === -1) {
+    bms.push(id);
+    btn.textContent = '★ Saved';
+    btn.classList.add('saved');
+    showToast('📺 Video saved!');
+  } else {
+    bms.splice(idx, 1);
+    btn.textContent = '☆ Save';
+    btn.classList.remove('saved');
+  }
+  localStorage.setItem('rh_vid_bm', JSON.stringify(bms));
+}
+
+/* ── LOAD WEB REFS ── */
+async function loadWebRefs(key, name) {
+  const cacheKey = `rh_web_${key}`;
+  const cached = getCache(cacheKey);
+  let refs = cached;
+  
+  if (!refs) {
+    refs = FALLBACK_DATA.web[key] || FALLBACK_DATA.web['default'];
+    setCache(cacheKey, refs);
+  }
+  
+  document.getElementById('cnt-web').textContent = refs.length;
+  renderWebRefs(refs);
+  fetchAIRecommendation('web', name, refs);
+}
+
+function renderWebRefs(refs) {
+  document.getElementById('webGrid').innerHTML = refs.map((r, i) => `
+    <a class="webref-card" href="${r.url}" target="_blank" rel="noopener" style="animation-delay:${i*0.07}s">
+      <div class="webref-favicon" style="font-size:1.4rem">${r.favicon}</div>
+      <div class="webref-info">
+        <div class="webref-title">${escHtml(r.title)}</div>
+        <div class="webref-desc">${escHtml(r.desc)}</div>
+        <div class="webref-domain">🔗 ${r.domain}</div>
+      </div>
+      <span class="webref-badge badge-${r.badge || 'free'}">${r.badge === 'pdf' ? '📄 PDF' : r.badge === 'pro' ? '★ Pro' : '✓ Free'}</span>
+      <span class="webref-arrow">→</span>
+    </a>`).join('');
+  document.getElementById('webAiBanner').style.display = 'flex';
+}
+
+/* ── LOAD NOTES ── */
+/* ── LOAD NOTES — Groq-powered real PDFs from internet ── */
+async function loadNotes(key, name) {
+  const cacheKey = `rh_notes_${key}`;
+  const cached = getCache(cacheKey);
+  if (cached && cached.length > 0) {
+    document.getElementById('cnt-notes').textContent = cached.length;
+    renderNotes(cached);
+    fetchAIRecommendation('notes', name, cached);
+    return;
+  }
+
+  // Show skeleton
+  document.getElementById('notesGrid').innerHTML = Array(4).fill(0).map(() => `
+    <div class="note-card" style="opacity:.4;pointer-events:none;">
+      <div class="note-card-icon icon-pdf" style="animation:pulse 1.2s infinite;">📄</div>
+      <div class="note-card-title" style="background:var(--surface-border);height:14px;border-radius:6px;margin-bottom:8px;"></div>
+      <div class="note-card-source" style="background:var(--surface-border);height:10px;border-radius:6px;width:60%;"></div>
+    </div>`).join('');
+
+  let notes = [];
+
+  try {
+    const groqKey = localStorage.getItem('groqApiKey') || GROQ_KEY;
+
+    const prompt = `You are an academic resource curator. For the subject "${name}", find 12 real, high-quality study notes and PDFs that students can access directly online for FREE.
+
+Return ONLY a raw JSON array — no markdown, no explanation, no backticks.
+
+Each object must have exactly these keys:
+- "title": descriptive name of the notes/PDF
+- "type": one of "pdf", "web", "doc"  
+- "source": institution or website name (e.g. "MIT OpenCourseWare", "NPTEL", "Stanford", "GeeksforGeeks")
+- "size": estimated file size like "2.4 MB" or "Web page" for non-PDFs
+- "url": a REAL, DIRECT, publicly accessible URL — no login required
+- "description": one sentence about what this covers
+
+STRICT URL RULES — only use URLs from these trusted sources that host free content:
+- NPTEL: https://nptel.ac.in/courses/... or https://archive.nptel.ac.in/...
+- MIT OCW: https://ocw.mit.edu/courses/... (lecture notes pages)
+- Stanford: https://cs229.stanford.edu/ or https://web.stanford.edu/class/...
+- IIT lecture notes on GitHub: https://github.com/... or https://raw.githubusercontent.com/...
+- GeeksforGeeks: https://www.geeksforgeeks.org/...
+- Tutorialspoint: https://www.tutorialspoint.com/...
+- W3Schools: https://www.w3schools.com/...
+- MDN Web Docs: https://developer.mozilla.org/...
+- JavaTpoint: https://www.javatpoint.com/...
+- Programiz: https://www.programiz.com/...
+- freeCodeCamp: https://www.freecodecamp.org/...
+- devdocs.io: https://devdocs.io/...
+- Khan Academy: https://www.khanacademy.org/...
+
+For type "pdf" — only use direct .pdf file URLs that actually exist and are publicly accessible.
+For type "web" — use the actual page URL where notes exist.
+
+Mix of: lecture notes, cheat sheets, complete course notes, reference guides, solved examples.
+Include at least 4-5 type "web" entries from reliable sites — these always work.`;
+
+    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${groqKey}`
+      },
+      body: JSON.stringify({
+        model: 'llama3-70b-8192',
+        max_tokens: 3000,
+        temperature: 0.2,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    if (res.ok) {
+      const json = await res.json();
+      let text = (json.choices?.[0]?.message?.content || '').trim();
+      // Strip markdown fences
+      text = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '').trim();
+      const match = text.match(/\[[\s\S]*\]/);
+      if (match) {
+        const parsed = JSON.parse(match[0]);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          notes = parsed.map(n => ({
+            title:       String(n.title || 'Study Notes'),
+            type:        ['pdf','web','doc','ppt'].includes(n.type) ? n.type : 'web',
+            source:      String(n.source || ''),
+            size:        String(n.size || ''),
+            url:         String(n.url || '#'),
+            description: String(n.description || '')
+          }));
+        }
+      }
+    }
+  } catch(e) { console.warn('Groq notes error:', e); }
+
+  // Fallback if Groq fails
+  if (notes.length === 0) {
+    notes = FALLBACK_DATA.notes[key] || FALLBACK_DATA.notes['default'];
+  }
+
+  setCache(cacheKey, notes);
+  document.getElementById('cnt-notes').textContent = notes.length;
+  renderNotes(notes);
+  fetchAIRecommendation('notes', name, notes);
+}
+
+function renderNotes(notes) {
+  const icons      = { pdf:'📄', doc:'📝', ppt:'📊', web:'🌐' };
+  const iconCls    = { pdf:'icon-pdf', doc:'icon-doc', ppt:'icon-ppt', web:'icon-web' };
+  const typeLbl    = { pdf:'📥 Open PDF', doc:'📥 Open Doc', ppt:'📊 Open Slides', web:'↗ Open Page' };
+
+  document.getElementById('notesGrid').innerHTML = notes.map((n, i) => {
+    // Safely encode URL for use in onclick attribute
+    const safeUrl = encodeURIComponent(n.url || '#');
+    const safeType = encodeURIComponent(n.type || 'web');
+    return `
+    <div class="note-card" style="animation-delay:${i*0.06}s;cursor:pointer;" onclick="openNote('${safeUrl}')">
+      <div class="note-card-icon ${iconCls[n.type] || 'icon-web'}">${icons[n.type] || '🌐'}</div>
+      <div class="note-card-title">${escHtml(n.title)}</div>
+      ${n.description ? `<div style="font-size:0.76rem;color:var(--text-muted);margin:4px 0 6px;line-height:1.4;">${escHtml(n.description)}</div>` : ''}
+      <div class="note-card-source">📌 ${escHtml(n.source)}</div>
+      <div class="note-card-footer">
+        <button class="note-dl-btn" onclick="event.stopPropagation();openNote('${safeUrl}')">
+          ${typeLbl[n.type] || '↗ Open'}
+        </button>
+        <span class="note-size">${escHtml(n.size || '')}</span>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('notesAiBanner').style.display = 'flex';
+}
+
+function openNote(encodedUrl) {
+  let url = '';
+  try { url = decodeURIComponent(encodedUrl); } catch(e) { url = encodedUrl; }
+  if (!url || url === '#' || url === 'undefined') {
+    showToast('⚠️ No link available'); return;
+  }
+  // Always open in new tab — most reliable cross-browser approach
+  const a = document.createElement('a');
+  a.href = url;
+  a.target = '_blank';
+  a.rel = 'noopener noreferrer';
+  // For PDFs: hint browser to open, not just navigate
+  if (url.toLowerCase().endsWith('.pdf')) {
+    a.setAttribute('type', 'application/pdf');
+  }
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => document.body.removeChild(a), 300);
+  showToast(url.endsWith('.pdf') ? '📥 Opening PDF…' : '↗ Opening resource…');
+}
+
+/* ── LEARNING PATH ── */
+function loadLearningPath(key, name) {
+  const steps = LEARNING_PATHS[key] || LEARNING_PATHS['default'];
+  const progressKey = `rh_lp_${key}`;
+  const doneSteps = JSON.parse(localStorage.getItem(progressKey) || '[]');
+  
+  document.getElementById('lpSteps').innerHTML = steps.map((step, i) => {
+    const done = doneSteps.includes(i);
+    return `
+    <div class="lp-step ${done ? 'done' : ''}" style="animation-delay:${i*0.06}s">
+      <div class="lp-step-num">${done ? '✓' : i+1}</div>
+      <div class="lp-step-body">
+        <div class="lp-step-title">${escHtml(step.title)}</div>
+        <div class="lp-step-desc">${escHtml(step.desc)}</div>
+      </div>
+      <span class="lp-step-tag">${escHtml(step.tag)}</span>
+    </div>`;
+  }).join('');
+  
+  fetchAIRecommendation('path', name, steps);
+}
+
+/* ── AI RECOMMENDATIONS via Groq ── */
+async function fetchAIRecommendation(type, subjectName, data) {
+  const bannerTextEl = document.getElementById(`${type === 'path' ? 'path' : type}AiText`);
+  const btnEl = document.getElementById(`${type === 'path' ? 'path' : type}AiBtn`);
+  if (!bannerTextEl) return;
+  
+  bannerTextEl.textContent = 'AI is analyzing resources for you…';
+  if (btnEl) btnEl.disabled = true;
+  
+  const prompts = {
+    videos: `You are a study advisor. Given a student studying "${subjectName}", suggest in 2 sentences which type of videos to watch first and why. Be specific and encouraging. Max 60 words.`,
+    web: `You are a study advisor. For a student studying "${subjectName}", recommend in 2 sentences the single best learning strategy when using these websites. Be actionable. Max 60 words.`,
+    notes: `You are a study advisor. For a student studying "${subjectName}", give 2-sentence advice on how to use notes most effectively — active recall, spaced repetition, etc. Max 60 words.`,
+    path: `You are a study advisor. For "${subjectName}", give a 2-sentence motivational message about following the learning path and one key tip for success. Max 60 words.`,
+  };
+  
+  try {
+    // Try Groq API
+    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('groqApiKey') || GROQ_KEY}`
+      },
+      body: JSON.stringify({
+        model: 'llama3-8b-8192',
+        messages: [{ role: 'user', content: prompts[type] }],
+        max_tokens: 120,
+        temperature: 0.7
+      })
+    });
+    if (res.ok) {
+      const json = await res.json();
+      const text = json.choices?.[0]?.message?.content?.trim();
+      if (text) { bannerTextEl.textContent = text; if(btnEl) btnEl.disabled = false; return; }
+    }
+  } catch(e) {}
+  
+  // Fallback static recommendations
+  const fallbacks = {
+    videos: { 
+      c: 'Start with CS50\'s C week — it\'s the gold standard for understanding memory and pointers. Combine with Neso Academy for exam-focused content.',
+      ai: 'Watch 3Blue1Brown\'s neural network series first — the visual intuition is unmatched. Then reinforce with Neso Academy\'s GATE-focused lectures.',
+      fe: 'Begin with the freeCodeCamp full JS course for fundamentals, then Traversy Media\'s DOM manipulation for hands-on practice.',
+      os: 'Gate Smashers covers OS with GATE precision. Pair it with the Linux command-line course to build practical skills alongside theory.',
+      default: 'Start with the most-viewed video to build intuition, then use topic-specific videos to go deeper. Take notes and pause often.'
+    },
+    web: {
+      c: 'Use GeeksforGeeks for quick concept checks and CS50 for deep understanding. Practice on Programiz\'s interactive editor daily.',
+      ai: 'Read the Nielsen neural networks book while doing NPTEL labs. Apply concepts in Python — theory alone won\'t cut it.',
+      fe: 'Make MDN your daily reference and javascript.info your primary textbook. Build a small project after each chapter.',
+      os: 'OSTEP is the best free OS book on the internet. Read one chapter, then solve related GATE questions on GFG.',
+      default: 'Pick one resource as your primary source and use others only for clarification. Avoid switching too often — depth beats breadth.'
+    },
+    notes: {
+      c: 'Use the cheat sheets for quick revision before exams. For deep understanding, write your own notes while solving problems.',
+      ai: 'The ANN visual notes from Stanford are exceptional — study them alongside coding examples to build genuine understanding.',
+      fe: 'The ES6+ cheat sheet and Git reference are must-bookmarks. Review them weekly and challenge yourself to use new features.',
+      os: 'Pair the complete notes with solved problems. Don\'t just read — reproduce diagrams and algorithms from memory.',
+      default: 'After reading notes, close them and write down everything you remember. This active recall doubles retention.'
+    },
+    path: {
+      c: 'Every C expert once struggled with pointers — it\'s a rite of passage. Follow the path consistently and you\'ll be writing production code within 4 weeks.',
+      ai: 'AI concepts compound: each step builds on the last. If fuzzy logic feels abstract, that\'s normal — it clicks when you see it applied.',
+      fe: 'Frontend engineering is a superpower in today\'s world. Build something real at every step — employers care about projects, not just grades.',
+      os: 'OS is the foundation of computer science. Every step you complete makes you a better programmer, even if it\'s invisible.',
+      default: 'Consistency is more powerful than intensity. Complete one step per day and you\'ll finish the path ahead of schedule.'
+    }
+  };
+  
+  const fb = fallbacks[type];
+  bannerTextEl.textContent = fb?.[currentSubject?.key] || fb?.default || 'Focus on understanding, not just completing. Quality over quantity.';
+  if (btnEl) btnEl.disabled = false;
+}
+
+async function regenAI(type) {
+  if (!currentSubject) return;
+  const key = currentSubject.key;
+  const name = currentSubject.name;
+  
+  // Clear cache for this type so it re-fetches
+  const cacheMap = { videos: `rh_videos_${key}`, web: `rh_web_${key}`, notes: `rh_notes_${key}` };
+  if (cacheMap[type]) localStorage.removeItem(cacheMap[type]);
+  
+  await fetchAIRecommendation(type, name, []);
+  showToast('✦ AI refreshed!');
+}
+
+/* ── PROGRESS TRACKING ── */
+function trackView(subjectKey, type, idx) {
+  const viewKey = `${subjectKey}_${type}_${idx}`;
+  if (!viewedResources[viewKey]) {
+    viewedResources[viewKey] = true;
+    localStorage.setItem('rh_viewed', JSON.stringify(viewedResources));
+    
+    // Update progress
+    const views = Object.keys(viewedResources).filter(k => k.startsWith(subjectKey)).length;
+    const total = 15; // approx total resources per subject
+    const pct = Math.min(Math.round((views / total) * 100), 100);
+    subjectProgress[subjectKey] = pct;
+    localStorage.setItem('rh_progress', JSON.stringify(subjectProgress));
+    
+    updateProgressTracker(subjectKey, currentSubject?.name || '');
+  }
+}
+
+function updateProgressTracker(key, name) {
+  const pt = document.getElementById('progressTracker');
+  const views = Object.keys(viewedResources).filter(k => k.startsWith(key)).length;
+  const pct = subjectProgress[key] || 0;
+  
+  document.getElementById('ptSubject').textContent = name;
+  document.getElementById('ptFill').style.width = pct + '%';
+  document.getElementById('ptViewed').textContent = `${views} resources opened`;
+  document.getElementById('ptPct').textContent = pct + '%';
+  
+  pt.classList.add('visible');
+}
+
+function updateStats() {
+  document.getElementById('statBookmarks').textContent = bookmarkedCards.length;
+}
+
+/* ── CACHE ── */
+function getCache(key) {
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return null;
+    const { data, ts } = JSON.parse(raw);
+    if (Date.now() - ts > CACHE_TTL) { localStorage.removeItem(key); return null; }
+    return data;
+  } catch(e) { return null; }
+}
+function setCache(key, data) {
+  try { localStorage.setItem(key, JSON.stringify({ data, ts: Date.now() })); } catch(e) {}
+}
+
+/* ── TOAST ── */
+function showToast(msg, duration = 2500) {
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.textContent = msg;
+  container.appendChild(toast);
+  setTimeout(() => {
+    toast.classList.add('out');
+    setTimeout(() => toast.remove(), 400);
+  }, duration);
+}
+
+/* ── UTILS ── */
+function escHtml(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
+</body>
+</html>

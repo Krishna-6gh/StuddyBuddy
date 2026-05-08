@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/png" href="logo.png">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StudyBuddy | AI Code Lab</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"></script>
+  <script>
+    (function () {
+      try {
+        /* Force dark theme for the compiler page */
+        document.documentElement.setAttribute('data-ctheme', localStorage.getItem('sb_compiler_theme') || 'dark');
+      } catch (e) {}
+    })();
+  </script>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <!-- Monaco Editor -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.44.0/min/vs/loader.min.js"></script>
+
+  <link rel="stylesheet" href="compiler.css" />
+</head>
+
+<body>
+
+<!-- BG Orbs + Grid -->
+<div class="bg-orbs" aria-hidden="true">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+</div>
+
+<!-- NAVBAR -->
+<nav class="quiz-nav" role="navigation" aria-label="Compiler navigation">
+  <a href="dashboard.html" class="nav-brand" aria-label="StudyBuddy home">
+    <!-- <div class="nav-brand-icon" aria-hidden="true">B</div> -->
+    <img src="logo.png" width="30px" height="30px">
+    StudyBuddy
+  </a>
+  <div class="nav-center" aria-hidden="true">✦ AI Code Lab ✦</div>
+  <a href="dashboard.html" class="back-btn">← Dashboard</a>
+</nav>
+
+<!-- MAIN LAYOUT -->
+<main class="compiler-main">
+
+  <!-- ── TOOLBAR ── -->
+  <div class="toolbar">
+    <div class="toolbar-left">
+
+      <!-- Language Selector — custom dropdown -->
+      <div class="lang-selector-wrap" id="langSelectorWrap">
+        <button class="lang-trigger" id="langTrigger" onclick="toggleLangDropdown()" aria-haspopup="listbox" aria-expanded="false">
+          <span class="lang-icon" id="langIcon">🟨</span>
+          <span class="lang-trigger-label" id="langTriggerLabel">JavaScript</span>
+          <span class="lang-chevron" id="langChevron">▾</span>
+        </button>
+        <!-- Hidden select for form compatibility -->
+        <select class="lang-select-hidden" id="langSelect" aria-label="Select programming language" onchange="switchLanguage(this.value)">
+          <option value="javascript">JavaScript</option>
+          <option value="python">Python</option>
+          <option value="c">C</option>
+          <option value="cpp">C++</option>
+        </select>
+
+        <!-- Custom dropdown panel -->
+        <div class="lang-dropdown" id="langDropdown" role="listbox" aria-label="Programming language">
+          <div class="lang-dropdown-header">Choose Language</div>
+          <button class="lang-option active" data-lang="javascript" onclick="selectLang('javascript')" role="option">
+            <span class="lang-opt-icon">🟨</span>
+            <div class="lang-opt-info">
+              <span class="lang-opt-name">JavaScript</span>
+              <span class="lang-opt-desc">Browser sandbox • Instant</span>
+            </div>
+            <span class="lang-opt-check">✓</span>
+          </button>
+          <button class="lang-option" data-lang="python" onclick="selectLang('python')" role="option">
+            <span class="lang-opt-icon">🐍</span>
+            <div class="lang-opt-info">
+              <span class="lang-opt-name">Python</span>
+              <span class="lang-opt-desc">Pyodide WASM • No network</span>
+            </div>
+            <span class="lang-opt-check">✓</span>
+          </button>
+          <button class="lang-option" data-lang="c" onclick="selectLang('c')" role="option">
+            <span class="lang-opt-icon">🔵</span>
+            <div class="lang-opt-info">
+              <span class="lang-opt-name">C</span>
+              <span class="lang-opt-desc">Judge0 CE • GCC</span>
+            </div>
+            <span class="lang-opt-check">✓</span>
+          </button>
+          <button class="lang-option" data-lang="cpp" onclick="selectLang('cpp')" role="option">
+            <span class="lang-opt-icon">🔷</span>
+            <div class="lang-opt-info">
+              <span class="lang-opt-name">C++</span>
+              <span class="lang-opt-desc">Judge0 CE • G++</span>
+            </div>
+            <span class="lang-opt-check">✓</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- File name pill -->
+      <div class="filename-pill" id="filenamePill">main.js</div>
+    </div>
+
+    <div class="toolbar-center">
+      <div class="toolbar-badge">
+        <span class="badge-dot" id="statusDot"></span>
+        <span id="statusText">Ready</span>
+      </div>
+    </div>
+
+    <div class="toolbar-right">
+      <!-- Theme Switcher -->
+      <div class="theme-switcher" id="themeSwitcher">
+        <button class="tb-btn ghost theme-btn" onclick="toggleThemePanel()" title="Change theme" id="themeBtnTrigger">
+          <span id="themeIcon">🌑</span> Theme
+        </button>
+        <div class="theme-panel" id="themePanel">
+          <div class="theme-panel-title">Editor Theme</div>
+          <button class="theme-option active" data-theme="dark" onclick="applyTheme('dark')">
+            <span class="theme-swatch dark-swatch"></span>
+            <div class="theme-opt-info">
+              <span class="theme-opt-name">Dark</span>
+              <span class="theme-opt-desc">Deep navy + green</span>
+            </div>
+            <span class="theme-opt-check">✓</span>
+          </button>
+          <button class="theme-option" data-theme="light" onclick="applyTheme('light')">
+            <span class="theme-swatch light-swatch"></span>
+            <div class="theme-opt-info">
+              <span class="theme-opt-name">Light</span>
+              <span class="theme-opt-desc">White + green • Dashboard</span>
+            </div>
+            <span class="theme-opt-check">✓</span>
+          </button>
+          <button class="theme-option" data-theme="midnight" onclick="applyTheme('midnight')">
+            <span class="theme-swatch midnight-swatch"></span>
+            <div class="theme-opt-info">
+              <span class="theme-opt-name">Midnight</span>
+              <span class="theme-opt-desc">Pure black + violet</span>
+            </div>
+            <span class="theme-opt-check">✓</span>
+          </button>
+        </div>
+      </div>
+
+      <button class="tb-btn ghost" onclick="exportPDF()" title="Export as PDF" aria-label="Export PDF">
+        <span>📄</span> PDF
+      </button>
+      <button class="tb-btn ghost" onclick="clearEditor()" title="Clear code" aria-label="Clear editor">
+        <span>🗑</span> Clear
+      </button>
+      <button class="tb-btn ghost" onclick="restoreLastCode()" title="Restore last run" aria-label="Restore last code">
+        <span>↩</span> Restore
+      </button>
+      <button class="tb-btn ghost" onclick="toggleFullscreen()" title="Fullscreen" aria-label="Toggle fullscreen" id="fsBtn">
+        <span>⛶</span> Fullscreen
+      </button>
+      <button class="tb-btn solid run-btn" onclick="runCode()" id="runBtn" aria-label="Run code">
+        ▶ &nbsp;Run
+      </button>
+    </div>
+  </div>
+
+  <!-- ── SPLIT PANE ── -->
+  <div class="split-pane" id="splitPane">
+
+    <!-- LEFT: Code Editor -->
+    <div class="editor-pane" id="editorPane">
+      <div class="pane-header">
+        <div class="pane-title">
+          <span class="pane-dot red"></span>
+          <span class="pane-dot yellow"></span>
+          <span class="pane-dot green"></span>
+          <span class="pane-label">editor</span>
+        </div>
+        <div class="editor-actions">
+          <button class="icon-btn" onclick="formatCode()" title="Format code" aria-label="Format code">✦ Format</button>
+          <button class="icon-btn" onclick="copyCode()" title="Copy code" aria-label="Copy code" id="copyBtn">⎘ Copy</button>
+        </div>
+      </div>
+      <div id="monacoEditor" style="height:calc(100% - 44px - 90px);width:100%;transition:height 0.2s"></div>
+
+      <!-- ── STDIN PANEL ── -->
+      <div class="stdin-panel collapsed" id="stdinPanel">
+        <div class="stdin-header" onclick="toggleStdin()" title="Toggle stdin input">
+          <div class="stdin-header-left">
+            <span class="stdin-label-icon">⌨️</span>
+            <span>Standard Input (stdin)</span>
+            <span class="stdin-count" id="stdinCount"></span>
+            <span class="stdin-needs-badge">⚠ input() detected</span>
+          </div>
+          <div class="stdin-header-right">
+            <span class="stdin-chevron">▾</span>
+          </div>
+        </div>
+        <div class="stdin-body">
+          <textarea
+            class="stdin-input"
+            id="stdinInput"
+            placeholder="Enter program input here (one value per line)…"
+            spellcheck="false"
+            autocomplete="off"
+            aria-label="Standard input for program"
+          ></textarea>
+          <div class="stdin-footer">
+            <span>Each line = one input() call</span>
+            <button class="stdin-clear-btn" onclick="clearStdin()" title="Clear stdin">✕ Clear</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESIZE HANDLE -->
+    <div class="resize-handle" id="resizeHandle" title="Drag to resize" aria-hidden="true">
+      <div class="resize-grip">
+        <div></div><div></div><div></div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Output + AI Panel -->
+    <div class="output-pane" id="outputPane">
+
+      <!-- Tabs -->
+      <div class="tabs-bar">
+        <button class="tab active" data-tab="output" onclick="switchTab('output')" aria-selected="true">
+          ⚡ Output
+        </button>
+        <button class="tab" data-tab="errors" onclick="switchTab('errors')" aria-selected="false">
+          ❌ Errors
+          <span class="tab-badge" id="errorBadge" style="display:none">0</span>
+        </button>
+        <button class="tab" data-tab="ai" onclick="switchTab('ai')" aria-selected="false">
+          🤖 AI Insights
+          <span class="tab-badge ai-badge" id="aiBadge" style="display:none">!</span>
+        </button>
+        <button class="tab" data-tab="history" onclick="switchTab('history')" aria-selected="false">
+          🕒 History
+        </button>
+      </div>
+
+      <!-- Tab Content -->
+      <div class="tab-content">
+
+        <!-- OUTPUT TAB -->
+        <div class="tab-panel active" id="tab-output" style="padding:12px; overflow:hidden;">
+          <div class="output-meta" id="outputMeta" style="display:none">
+            <span class="meta-pill time" id="execTime">⏱ 0ms</span>
+            <span class="meta-pill lang" id="execLang">JS</span>
+            <span class="meta-pill success" id="execStatus">✅ Success</span>
+          </div>
+          <div class="output-content" id="outputContent" aria-live="polite"><span class="output-placeholder">
+  ┌─────────────────────────────┐
+  │                             │
+  │   Hit ▶ Run to execute      │
+  │   your code here            │
+  │                             │
+  └─────────────────────────────┘</span></div>
+        </div>
+
+        <!-- ERRORS TAB -->
+        <div class="tab-panel" id="tab-errors">
+          <div class="error-content" id="errorContent">
+            <div class="empty-state">
+              <div class="empty-icon">✅</div>
+              <div class="empty-text">No errors yet</div>
+              <div class="empty-sub">Run your code to check</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI INSIGHTS TAB -->
+        <div class="tab-panel" id="tab-ai">
+          <div class="ai-content" id="aiContent">
+            <div class="ai-idle">
+              <div class="ai-orb-wrap" aria-hidden="true">
+                <div class="ai-orb"></div>
+                <div class="ai-orb-ring"></div>
+              </div>
+              <div class="ai-idle-title">AI Mentor Ready</div>
+              <div class="ai-idle-sub">Run your code and I'll analyze it — errors, optimizations, complexity hints, and more.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- HISTORY TAB -->
+        <div class="tab-panel" id="tab-history">
+          <div class="history-content" id="historyContent">
+            <div class="empty-state">
+              <div class="empty-icon">📂</div>
+              <div class="empty-text">No history yet</div>
+              <div class="empty-sub">Your recent runs will appear here</div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /tab-content -->
+
+      <!-- Did You Know bar -->
+      <div class="did-you-know" id="didYouKnow">
+        <span class="dyk-icon">💡</span>
+        <span id="dykText">Loading tip…</span>
+      </div>
+
+    </div><!-- /output-pane -->
+  </div><!-- /split-pane -->
+
+</main>
+
+<!-- FULLSCREEN OVERLAY -->
+<div class="fs-overlay" id="fsOverlay" aria-hidden="true"></div>
+
+<!-- COMPILING OVERLAY -->
+<div class="compile-overlay hidden" id="compileOverlay" role="status" aria-label="Compiling code">
+  <div class="compile-spinner">
+    <div class="cs-ring"></div>
+    <div class="cs-ring"></div>
+    <div class="cs-ring"></div>
+  </div>
+  <div class="compile-text" id="compileText">Compiling…</div>
+  <div class="compile-sub">Powered by AI ✦ Piston Engine</div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast" role="alert" aria-live="assertive"></div>
+
+
+<!-- PDF EXPORT MODAL -->
+<div class="pdf-modal-overlay" id="pdfModalOverlay">
+  <div class="pdf-modal" role="dialog" aria-modal="true" aria-label="Export as PDF">
+    <div class="pdf-modal-header">
+      <div class="pdf-modal-title">
+        <span class="pdf-modal-title-icon">📄</span>
+        Export Solution as PDF
+      </div>
+      <button class="pdf-modal-close" onclick="closePDFModal()" aria-label="Close">✕</button>
+    </div>
+
+    <div class="pdf-field">
+      <label class="pdf-label" for="pdfTitle">Solution Title</label>
+      <input class="pdf-input" type="text" id="pdfTitle" placeholder="e.g. Binary Search in C++" />
+    </div>
+    <div class="pdf-field">
+      <label class="pdf-label" for="pdfAuthor">Author Name</label>
+      <input class="pdf-input" type="text" id="pdfAuthor" placeholder="Your name" />
+    </div>
+    <div class="pdf-field">
+      <label class="pdf-label" for="pdfNotes">Notes / Explanation (optional)</label>
+      <textarea class="pdf-textarea" id="pdfNotes" placeholder="Explain your approach, time complexity, etc…"></textarea>
+    </div>
+    <div>
+      <label class="pdf-checkrow">
+        <input type="checkbox" id="pdfIncludeOutput" checked /> Include program output
+      </label>
+      <label class="pdf-checkrow">
+        <input type="checkbox" id="pdfIncludeAI" /> Include AI insights
+      </label>
+    </div>
+    <div class="pdf-modal-footer">
+      <button class="pdf-btn-cancel" onclick="closePDFModal()">Cancel</button>
+      <button class="pdf-btn-export" onclick="generatePDF()">📄 Export PDF</button>
+    </div>
+  </div>
+</div>
+
+<script src="compiler.js"></script>
+</body>
+</html>

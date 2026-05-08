@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/png" href="logo.png">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StudyBuddy Quiz | Chitkara University</title>
+
+  <script>
+    (function () {
+      try {
+        const t = localStorage.getItem('theme') || 'green';
+        document.documentElement.setAttribute('data-theme', t);
+      } catch (e) {}
+    })();
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="quiz.css" />
+
+  <style>
+    .screen.hidden { display: none !important; }
+    body { opacity: 0; animation: bodyIn 0.45s 0.1s ease forwards; }
+    @keyframes bodyIn { to { opacity: 1; } }
+
+    /* ── Mode Tabs ── */
+    .mode-tabs { display: flex; gap: 6px; margin-bottom: 24px; padding: 5px; background: var(--surface-alt); border-radius: 16px; border: 1px solid var(--border-soft); }
+    .mode-tab {
+      flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px;
+      padding: 10px 8px; border-radius: 12px; border: none; background: transparent;
+      color: var(--text-muted); font-family: 'DM Sans', sans-serif; font-size: 0.75rem;
+      font-weight: 600; cursor: pointer; transition: all 0.25s; letter-spacing: 0.3px;
+    }
+    .mode-tab .tab-icon { font-size: 1.2rem; line-height: 1; }
+    .mode-tab.active {
+      background: var(--surface); color: var(--primary);
+      box-shadow: 0 2px 12px var(--primary-glow); border: 1px solid var(--border);
+    }
+
+    /* ── Config extras ── */
+    .config-tip {
+      display: flex; align-items: flex-start; gap: 10px;
+      margin-top: 18px; padding: 14px 18px; border-radius: 14px;
+      background: rgba(6,182,212,0.06); border: 1px solid rgba(6,182,212,0.18);
+      font-size: 0.82rem; color: var(--text-muted); line-height: 1.5;
+    }
+    .config-tip-icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+
+    /* ── Topic multi-select chip grid ── */
+    .topic-chips-wrapper {
+      margin-top: 8px; max-height: 160px; overflow-y: auto;
+      padding: 10px; border-radius: 14px;
+      border: 1px solid var(--border-soft); background: var(--surface-alt);
+      display: flex; flex-wrap: wrap; gap: 7px;
+      scrollbar-width: thin;
+    }
+    .topic-chip {
+      padding: 6px 14px; border-radius: 50px; font-size: 0.78rem; font-weight: 600;
+      border: 1.5px solid var(--border-soft); background: var(--opt-bg);
+      color: var(--opt-text); cursor: pointer; transition: all 0.2s;
+      user-select: none; white-space: nowrap;
+    }
+    .topic-chip:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-glow); }
+    .topic-chip.selected { background: var(--primary); color: #fff; border-color: var(--primary); box-shadow: 0 2px 10px var(--primary-glow); }
+    .topic-chips-label { font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+    .chip-hint { font-size: 0.73rem; color: var(--text-muted); margin-top: 6px; font-style: italic; }
+
+    /* ── Exam mode config ── */
+    .exam-config-section { display: flex; flex-direction: column; gap: 16px; }
+    .exam-name-input {
+      width: 100%; padding: 14px 18px; border-radius: 14px;
+      border: 1.5px solid var(--border-soft); background: var(--opt-bg);
+      color: var(--opt-text); font-family: 'DM Sans', sans-serif; font-size: 0.95rem;
+      font-weight: 500; outline: none; transition: border-color 0.2s;
+    }
+    .exam-name-input:focus { border-color: var(--purple); box-shadow: 0 0 0 3px rgba(139,92,246,0.1); }
+    .exam-name-input::placeholder { color: var(--text-muted); }
+    .exam-duration-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .exam-duration-btn {
+      padding: 12px; border-radius: 12px; border: 1.5px solid var(--border-soft);
+      background: var(--opt-bg); color: var(--opt-text); font-weight: 700;
+      font-size: 0.85rem; cursor: pointer; transition: all 0.2s; font-family: 'Syne', sans-serif;
+    }
+    .exam-duration-btn:hover, .exam-duration-btn.selected {
+      border-color: var(--purple); background: rgba(139,92,246,0.08); color: var(--purple);
+    }
+    .exam-generate-btn {
+      width: 100%; padding: 16px; border-radius: 16px; border: none;
+      background: linear-gradient(135deg, var(--purple), #6366f1, var(--cyan));
+      color: #fff; font-family: 'Syne', sans-serif; font-weight: 800;
+      font-size: 1rem; cursor: pointer; letter-spacing: 0.5px;
+      box-shadow: 0 4px 24px rgba(139,92,246,0.3);
+      transition: all 0.3s; margin-top: 4px;
+    }
+    .exam-generate-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(139,92,246,0.4); }
+
+    /* ── Recent Quizzes panel ── */
+    .recent-panel {
+      margin-top: 20px; border-radius: 18px;
+      border: 1px solid var(--border-soft); overflow: hidden;
+      background: var(--surface-alt);
+    }
+    .recent-panel-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 20px; cursor: pointer;
+      border-bottom: 1px solid var(--border-soft);
+      background: var(--surface);
+    }
+    .recent-panel-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.85rem; color: var(--text); display: flex; align-items: center; gap: 8px; }
+    .recent-panel-toggle { font-size: 0.75rem; color: var(--text-muted); transition: transform 0.3s; }
+    .recent-panel.open .recent-panel-toggle { transform: rotate(180deg); }
+    .recent-list { padding: 12px; display: flex; flex-direction: column; gap: 8px; max-height: 320px; overflow-y: auto; }
+    .recent-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 14px; border-radius: 12px;
+      border: 1px solid var(--border-soft); background: var(--opt-bg);
+      transition: border-color 0.2s;
+    }
+    .recent-item:hover { border-color: var(--primary); }
+    .recent-score-circle {
+      width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Syne', sans-serif; font-weight: 800; font-size: 0.78rem;
+    }
+    .recent-score-circle.pass { background: rgba(16,185,129,0.12); color: var(--green); border: 2px solid rgba(16,185,129,0.3); }
+    .recent-score-circle.fail { background: rgba(239,68,68,0.1); color: var(--red); border: 2px solid rgba(239,68,68,0.25); }
+    .recent-score-circle.exam { background: rgba(139,92,246,0.12); color: var(--purple); border: 2px solid rgba(139,92,246,0.3); }
+    .recent-meta { flex: 1; min-width: 0; }
+    .recent-subject { font-weight: 700; font-size: 0.84rem; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .recent-detail { font-size: 0.72rem; color: var(--text-muted); margin-top: 2px; }
+    .recent-badge { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; }
+    .recent-time-tag { font-size: 0.68rem; font-weight: 600; color: var(--text-muted); white-space: nowrap; }
+    .recent-type-tag { font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-radius: 50px; }
+    .recent-type-tag.quiz-tag { background: var(--primary-glow); color: var(--primary); }
+    .recent-type-tag.exam-tag { background: rgba(139,92,246,0.12); color: var(--purple); }
+    .no-recent { text-align: center; padding: 24px; color: var(--text-muted); font-size: 0.85rem; }
+
+    /* ── Skeleton ── */
+    .opt-skeleton {
+      height: 54px; border-radius: 14px;
+      background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.07) 50%, rgba(255,255,255,0.04) 75%);
+      background-size: 200% 100%; animation: skeletonShimmer 1.4s infinite; margin-bottom: 9px;
+    }
+    @keyframes skeletonShimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+    .result-divider { width: 100%; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.07), transparent); margin: 24px 0; }
+
+    /* ── Exam mode quiz topbar ── */
+    .exam-topbar-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 14px; border-radius: 50px; font-size: 0.72rem; font-weight: 700;
+      background: rgba(139,92,246,0.12); color: var(--purple);
+      border: 1px solid rgba(139,92,246,0.25); letter-spacing: 0.5px;
+    }
+    .exam-big-timer {
+      font-family: 'Syne', sans-serif; font-size: 1.3rem; font-weight: 800;
+      color: var(--purple); text-align: center; margin-bottom: 12px;
+      letter-spacing: 2px;
+    }
+    .exam-big-timer.warning { color: var(--amber); }
+    .exam-big-timer.danger { color: var(--red); animation: timerPulse 0.5s infinite; }
+    @keyframes timerPulse { 0%,100%{opacity:1} 50%{opacity:0.6} }
+
+    /* ── Quiz start animation overlay ── */
+    .quiz-start-overlay {
+      position: fixed; inset: 0; z-index: 500;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--bg); flex-direction: column; gap: 16px;
+    }
+    .quiz-start-overlay.hidden { display: none; }
+    .start-countdown {
+      font-family: 'Syne', sans-serif; font-size: 8rem; font-weight: 800;
+      color: var(--primary); animation: countPop 0.8s ease;
+      text-shadow: 0 0 60px var(--primary-glow);
+    }
+    @keyframes countPop { 0%{transform:scale(2);opacity:0} 50%{transform:scale(0.9)} 100%{transform:scale(1);opacity:1} }
+    .start-go { font-family: 'Syne', sans-serif; font-size: 4rem; font-weight: 800; color: var(--green); }
+    .start-label { font-size: 1rem; color: var(--text-muted); font-weight: 600; }
+    .start-subject-tag {
+      padding: 8px 20px; border-radius: 50px;
+      background: var(--primary-glow); border: 1px solid var(--border);
+      font-weight: 700; color: var(--primary); font-size: 0.9rem;
+    }
+
+    @media (max-width: 480px) {
+      .quiz-topbar { gap: 8px; }
+      .q-timer-badge span:not(.timer-led) { font-size: 0.8rem; }
+      .topic-chips-wrapper { max-height: 120px; }
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- ANIMATED BG -->
+<div class="bg-orbs" aria-hidden="true">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+</div>
+
+<!-- QUIZ START OVERLAY (countdown) -->
+<div class="quiz-start-overlay hidden" id="startOverlay" aria-hidden="true">
+  <div class="start-subject-tag" id="startSubjectTag">Mathematics</div>
+  <div class="start-countdown" id="startCountdown">3</div>
+  <div class="start-label" id="startLabel">Get ready…</div>
+</div>
+
+<!-- NAVBAR -->
+<nav class="quiz-nav" role="navigation" aria-label="Quiz navigation">
+  <a href="dashboard.html" class="nav-brand" aria-label="StudyBuddy home">
+    <!-- <div class="nav-brand-icon" aria-hidden="true">B</div> -->
+    <img src="logo.png" width="30px" height="30px">
+    StudyBuddy
+  </a>
+  <div class="nav-center" aria-hidden="true">✦ AI Quiz Mode ✦</div>
+  <a href="dashboard.html" class="back-btn">← Dashboard</a>
+</nav>
+
+
+<!-- ════════════ SCREEN 1 — CONFIG ════════════ -->
+<div class="screen" id="configScreen" role="main">
+  <div class="config-container">
+
+    <div class="config-eyebrow">✦ Powered by GROQ AI</div>
+
+    <h1 class="config-title">
+      Test Your<br>
+      <span class="gradient-text">Knowledge.</span>
+    </h1>
+    <p class="config-sub">
+      Pick a mode, choose your subject, and let's see what you've got. 🎯
+    </p>
+
+    <!-- MODE TABS -->
+    <div class="mode-tabs" role="tablist" aria-label="Quiz mode">
+      <button class="mode-tab active" id="tab-quiz" onclick="switchMode('quiz')" role="tab" aria-selected="true">
+        <span class="tab-icon">⚡</span>
+        Quick Quiz
+      </button>
+      <button class="mode-tab" id="tab-exam" onclick="switchMode('exam')" role="tab" aria-selected="false">
+        <span class="tab-icon">📝</span>
+        Exam Mode
+      </button>
+      <button class="mode-tab" id="tab-recent" onclick="switchMode('recent')" role="tab" aria-selected="false">
+        <span class="tab-icon">🕐</span>
+        History
+      </button>
+    </div>
+
+    <!-- QUIZ CONFIG CARD -->
+    <div class="config-card" id="quizConfigPanel">
+      <div class="config-card-header">Configure Your Quiz</div>
+
+      <div class="config-grid">
+        <div class="config-field">
+          <label class="config-label" for="quizSubject">Subject</label>
+          <select class="config-select" id="quizSubject" aria-label="Select subject">
+            <option>Loading subjects…</option>
+          </select>
+        </div>
+        <div class="config-field">
+          <label class="config-label" for="quizDifficulty">Difficulty</label>
+          <select class="config-select" id="quizDifficulty">
+            <option value="beginner">🌱 Beginner</option>
+            <option value="intermediate" selected>⚡ Intermediate</option>
+            <option value="advanced">🔥 Advanced</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="config-grid">
+        <div class="config-field">
+          <label class="config-label" for="quizCount">No. of Questions</label>
+          <select class="config-select" id="quizCount">
+            <option value="3">3 Questions</option>
+            <option value="5" selected>5 Questions</option>
+            <option value="8">8 Questions</option>
+            <option value="10">10 Questions</option>
+            <option value="15">15 Questions</option>
+            <option value="20">20 Questions</option>
+            <option value="25">25 Questions</option>
+          </select>
+        </div>
+        <div class="config-field">
+          <label class="config-label">Timer per Question</label>
+          <select class="config-select" id="quizTimer">
+            <option value="15">⚡ 15 seconds</option>
+            <option value="30" selected>⏱ 30 seconds</option>
+            <option value="45">🕐 45 seconds</option>
+            <option value="60">🕑 60 seconds</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- TOPIC CHIP SELECTOR -->
+      <div class="config-field" style="margin-top: 4px;">
+        <div class="topic-chips-label">Focus Topics <span style="color:var(--primary)">(select any, or none for random)</span></div>
+        <div class="topic-chips-wrapper" id="topicChipsContainer">
+          <span style="color:var(--text-muted);font-size:0.8rem;">Select a subject first…</span>
+        </div>
+        <div class="chip-hint" id="chipHint">Tip: Select multiple topics to focus your quiz on specific areas.</div>
+      </div>
+
+      <button class="generate-btn" onclick="generateQuiz()" aria-label="Generate quiz">
+        ✦ &nbsp; Generate Quiz &nbsp; ✦
+      </button>
+
+      <div class="error-msg" id="errorMsg" role="alert" aria-live="polite"></div>
+
+      <div class="config-tip">
+        <span class="config-tip-icon">💡</span>
+        <span>Topics are pre-loaded per subject. Select multiple to narrow focus, or leave all unselected for a random mix.</span>
+      </div>
+    </div>
+
+    <!-- EXAM CONFIG CARD -->
+    <div class="config-card hidden" id="examConfigPanel">
+      <div class="config-card-header" style="color:var(--purple);">🎓 Exam Mode — Full Subject Test</div>
+
+      <div class="exam-config-section">
+        <div class="config-field">
+          <label class="config-label" for="examSubject">Subject</label>
+          <select class="config-select" id="examSubject">
+            <option>Loading subjects…</option>
+          </select>
+        </div>
+
+        <div class="config-field">
+          <label class="config-label" for="examName">Exam Name (optional)</label>
+          <input type="text" class="exam-name-input" id="examName" placeholder="e.g. Mid-Sem Exam, Final Practice…" maxlength="60" />
+        </div>
+
+        <div class="config-field">
+          <label class="config-label">Exam Duration</label>
+          <div class="exam-duration-grid">
+            <button class="exam-duration-btn" data-mins="30" onclick="selectDuration(this)">30 min</button>
+            <button class="exam-duration-btn selected" data-mins="60" onclick="selectDuration(this)">1 hour</button>
+            <button class="exam-duration-btn" data-mins="90" onclick="selectDuration(this)">1.5 hours</button>
+            <button class="exam-duration-btn" data-mins="120" onclick="selectDuration(this)">2 hours</button>
+            <button class="exam-duration-btn" data-mins="150" onclick="selectDuration(this)">2.5 hours</button>
+            <button class="exam-duration-btn" data-mins="180" onclick="selectDuration(this)">3 hours</button>
+          </div>
+        </div>
+
+        <div class="config-field">
+          <label class="config-label" for="examDifficulty">Difficulty</label>
+          <select class="config-select" id="examDifficulty">
+            <option value="beginner">🌱 Beginner</option>
+            <option value="intermediate" selected>⚡ Intermediate</option>
+            <option value="advanced">🔥 Advanced</option>
+          </select>
+        </div>
+
+        <div class="config-tip" style="margin-top:0;">
+          <span class="config-tip-icon">📋</span>
+          <span>Exam mode generates <strong>25 questions</strong> covering all topics of the selected subject. Timer runs for the full duration — just like a real exam.</span>
+        </div>
+
+        <button class="exam-generate-btn" onclick="generateExam()">
+          📝 &nbsp; Start Exam &nbsp; →
+        </button>
+        <div class="error-msg" id="examErrorMsg" role="alert" aria-live="polite"></div>
+      </div>
+    </div>
+
+    <!-- RECENT HISTORY CARD -->
+    <div class="config-card hidden" id="recentPanel">
+      <div class="config-card-header">🕐 Recent Attempts</div>
+      <div id="recentListContainer"></div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ════════════ SCREEN 2 — LOADING ════════════ -->
+<div class="screen hidden" id="loadingScreen" role="status" aria-label="Generating quiz, please wait">
+  <div class="loading-wrapper">
+    <div class="loading-rings" aria-hidden="true">
+      <div class="loading-ring"></div>
+      <div class="loading-ring"></div>
+      <div class="loading-ring"></div>
+    </div>
+    <div class="loading-title" id="loadingText">Cooking up your quiz…</div>
+    <div class="loading-sub" id="loadingSub">Powered by GROQ AI &nbsp;✦&nbsp; Hold tight</div>
+    <div class="loading-dots" aria-hidden="true">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════ SCREEN 3 — QUIZ ════════════ -->
+<div class="screen hidden" id="quizScreen" role="main">
+  <div class="quiz-wrapper">
+
+    <!-- Exam timer (shown only in exam mode) -->
+    <div class="exam-big-timer hidden" id="examBigTimer" aria-live="polite">60:00</div>
+
+    <div class="quiz-topbar">
+      <div class="q-counter" id="qCounter" aria-label="Question progress">
+        Q<span class="hi">1</span> of <span class="hi">5</span>
+      </div>
+      <div class="progress-track" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+      </div>
+      <div class="q-timer-badge" id="qTimerBadge" aria-label="Time remaining">
+        <div class="timer-led" aria-hidden="true"></div>
+        <span id="timerText">0:30</span>
+      </div>
+    </div>
+
+    <div class="question-card" id="questionCard">
+      <div class="q-meta" aria-label="Question metadata">
+        <span class="q-tag subject" id="qSubjectTag">Subject</span>
+        <span class="q-tag difficulty" id="qDiffTag">Intermediate</span>
+        <span class="q-tag topic" id="qTopicTag">All Topics</span>
+      </div>
+
+      <div class="q-text" id="qText" role="heading" aria-level="2">
+        <div class="opt-skeleton" style="width:85%;height:22px;border-radius:6px;margin-bottom:8px"></div>
+        <div class="opt-skeleton" style="width:60%;height:22px;border-radius:6px"></div>
+      </div>
+
+      <div class="options-grid" id="optionsGrid" role="group" aria-label="Answer options">
+        <div class="opt-skeleton"></div>
+        <div class="opt-skeleton"></div>
+        <div class="opt-skeleton"></div>
+        <div class="opt-skeleton"></div>
+      </div>
+
+      <div class="feedback-panel" id="feedbackPanel" role="alert" aria-live="polite"></div>
+    </div>
+
+    <div class="quiz-bottombar">
+      <div class="score-badge" aria-label="Current score">
+        Score:&nbsp;
+        <span class="score-val" id="scoreVal">0</span>
+        <span style="color:var(--text-muted);font-size:0.8rem;">/&nbsp;<span id="totalQ">5</span></span>
+      </div>
+      <button class="next-btn" id="nextBtn" onclick="nextQuestion()" aria-label="Next question">
+        Next Question →
+      </button>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ════════════ SCREEN 4 — RESULTS ════════════ -->
+<div class="screen hidden" id="resultsScreen" role="main" aria-label="Quiz results">
+  <div class="results-wrapper">
+    <div class="results-card" id="resultsCard">
+
+      <span class="result-emoji-wrap" id="resultEmoji" aria-hidden="true">🎉</span>
+      <div class="result-headline pass" id="resultHeadline">PASSED!</div>
+      <div class="result-big-score pass" id="resultBigScore" aria-label="Final score">85%</div>
+      <div class="result-tagline" id="resultTagline"></div>
+
+      <div class="result-divider" aria-hidden="true"></div>
+
+      <div class="stats-row" role="list">
+        <div class="stat-box" role="listitem">
+          <div class="stat-num g" id="statCorrect">0</div>
+          <div class="stat-label">Correct</div>
+        </div>
+        <div class="stat-box" role="listitem">
+          <div class="stat-num r" id="statWrong">0</div>
+          <div class="stat-label">Wrong</div>
+        </div>
+        <div class="stat-box" role="listitem">
+          <div class="stat-num p" id="statPct">0%</div>
+          <div class="stat-label">Score</div>
+        </div>
+      </div>
+
+      <div class="weak-section" id="weakSection" style="display:none">
+        <div class="weak-section-title">⚠️ Topics to Review</div>
+        <div class="weak-tags" id="weakTags"></div>
+      </div>
+
+      <div class="result-divider" aria-hidden="true"></div>
+
+      <div class="result-actions">
+        <button class="res-btn ghost" onclick="retryQuiz()">↺ &nbsp;Try Again</button>
+        <button class="res-btn solid" onclick="goToDashboard()">Dashboard →</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════ SCREEN 5 — EXAM RESULTS ════════════ -->
+<div class="screen hidden" id="examResultsScreen" role="main" aria-label="Exam results">
+  <div class="exam-results-wrapper">
+    <div class="exam-results-card">
+
+      <div class="exam-result-badge">📝 Exam Results</div>
+      <div class="exam-name-display" id="examNameDisplay">Mid-Sem Practice</div>
+      <div class="exam-score-display" id="examScoreDisplay" aria-label="Exam score">0%</div>
+      <div class="exam-time-used" id="examTimeUsed"></div>
+
+      <div class="prep-level-section">
+        <div class="prep-level-title">Preparation Level</div>
+        <div class="prep-levels-track" id="prepLevelsTrack" aria-label="Preparation level bars">
+          <!-- Rendered by JS -->
+        </div>
+        <div style="margin-top:30px;">
+          <div class="prep-level-badge" id="prepLevelBadge">Good</div>
+          <div class="prep-level-sub" id="prepLevelSub">You're on the right track.</div>
+        </div>
+        <div class="prep-bar-outer">
+          <div class="prep-bar-fill" id="prepBarFill" style="width:0%"></div>
+        </div>
+        <div class="prep-bar-pct" id="prepBarPct">0%</div>
+
+        <div class="prep-metrics">
+          <div class="prep-metric">
+            <div class="prep-metric-val" id="pmCorrect">0</div>
+            <div class="prep-metric-lbl">Correct</div>
+          </div>
+          <div class="prep-metric">
+            <div class="prep-metric-val" id="pmWrong" style="color:var(--red)">0</div>
+            <div class="prep-metric-lbl">Wrong</div>
+          </div>
+          <div class="prep-metric">
+            <div class="prep-metric-val" id="pmTime">0m</div>
+            <div class="prep-metric-lbl">Time Used</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="weak-section" id="examWeakSection" style="display:none">
+        <div class="weak-section-title">⚠️ Topics to Revise</div>
+        <div class="weak-tags" id="examWeakTags"></div>
+      </div>
+
+      <div class="exam-actions">
+        <button class="res-btn ghost" onclick="retryQuiz()">↺ &nbsp;Try Again</button>
+        <button class="res-btn solid" style="background:linear-gradient(135deg,var(--purple),#6366f1,var(--cyan));" onclick="goToDashboard()">Dashboard →</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<canvas id="confettiCanvas" aria-hidden="true"></canvas>
+
+<script src="quiz.js"></script>
+
+</body>
+</html>

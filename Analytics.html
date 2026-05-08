@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/png" href="logo.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StudyBuddy — Analytics</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+/* ===== RESET & VARS ===== */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --primary:#059669;--primary-dark:#047857;--primary-light:#d1fae5;
+  --primary-glow:rgba(5,150,105,0.18);
+  --accent:#6366f1;--accent-glow:rgba(99,102,241,0.15);
+  --amber:#f59e0b;--rose:#f43f5e;--sky:#0ea5e9;
+  --bg:#f0fdf4;--bg2:#ecfdf5;
+  --surface:#ffffff;--surface2:#f8fafc;
+  --border:rgba(5,150,105,0.14);
+  --text:#0f172a;--text2:#334155;--muted:#64748b;
+  --shadow:0 4px 32px rgba(5,150,105,0.10);
+  --shadow-lg:0 12px 48px rgba(5,150,105,0.14);
+  --radius:22px;--radius-sm:14px;
+}
+[data-theme="dark"]{
+  --bg:#0a1628;--bg2:#0f1e35;
+  --surface:#132035;--surface2:#1a2d45;
+  --border:rgba(99,255,180,0.10);
+  --text:#f1f5f9;--text2:#cbd5e1;--muted:#64748b;
+  --shadow:0 4px 32px rgba(0,0,0,0.4);
+  --shadow-lg:0 12px 48px rgba(0,0,0,0.5);
+  --primary-light:rgba(5,150,105,0.18);
+}
+
+body{
+  font-family:'DM Sans',sans-serif;
+  background:var(--bg);color:var(--text);
+  min-height:100vh;
+  padding:0 0 60px;
+}
+
+/* ===== ANIMATED BG ===== */
+.bg-canvas{
+  position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;
+}
+.bg-blob{
+  position:absolute;border-radius:50%;filter:blur(120px);opacity:.12;
+  animation:drift 18s ease-in-out infinite alternate;
+}
+.bg-blob:nth-child(1){width:700px;height:700px;background:#10b981;top:-200px;right:-200px;animation-delay:0s}
+.bg-blob:nth-child(2){width:500px;height:500px;background:#6366f1;bottom:-100px;left:-100px;animation-delay:-8s}
+.bg-blob:nth-child(3){width:300px;height:300px;background:#f59e0b;top:40%;left:50%;animation-delay:-4s}
+@keyframes drift{0%{transform:translate(0,0) scale(1)}100%{transform:translate(30px,25px) scale(1.05)}}
+
+/* ===== TOPBAR ===== */
+.topbar{
+  position:sticky;top:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 40px;
+  background:rgba(255,255,255,0.82);
+  backdrop-filter:blur(18px);
+  border-bottom:1px solid var(--border);
+  box-shadow:0 2px 20px rgba(0,0,0,.05);
+}
+[data-theme="dark"] .topbar{background:rgba(13,30,53,0.88)}
+
+.topbar-left{display:flex;align-items:center;gap:16px}
+.back-btn{
+  display:flex;align-items:center;gap:8px;
+  padding:9px 18px;border-radius:12px;
+  background:var(--primary);color:white;border:none;
+  cursor:pointer;font-weight:700;font-size:.88rem;
+  font-family:'DM Sans',sans-serif;
+  transition:all .2s;
+}
+.back-btn:hover{background:var(--primary-dark);transform:translateX(-2px)}
+.page-title{
+  font-family:'Syne',sans-serif;font-size:1.45rem;font-weight:800;
+  color:var(--text);
+}
+.page-subtitle{font-size:.82rem;color:var(--muted);margin-top:1px}
+
+.topbar-right{display:flex;align-items:center;gap:12px}
+.date-chip{
+  padding:7px 14px;border-radius:10px;
+  background:var(--surface);border:1px solid var(--border);
+  font-size:.8rem;color:var(--muted);font-weight:600;
+}
+.refresh-btn{
+  padding:9px 14px;border-radius:12px;
+  background:var(--surface);border:1px solid var(--border);
+  color:var(--text);cursor:pointer;font-size:.85rem;
+  transition:all .2s;
+}
+.refresh-btn:hover{border-color:var(--primary);color:var(--primary)}
+
+/* ===== MAIN LAYOUT ===== */
+main{
+  position:relative;z-index:10;
+  max-width:1280px;margin:0 auto;
+  padding:36px 40px;
+}
+
+/* ===== HERO STATS ===== */
+.hero-stats{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:18px;margin-bottom:32px;
+}
+.stat-card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:24px;
+  box-shadow:var(--shadow);
+  position:relative;overflow:hidden;
+  transition:transform .25s,box-shadow .25s;
+  animation:slideUp .5s cubic-bezier(.16,1,.3,1) both;
+}
+.stat-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg)}
+.stat-card:nth-child(1){animation-delay:.05s}
+.stat-card:nth-child(2){animation-delay:.10s}
+.stat-card:nth-child(3){animation-delay:.15s}
+.stat-card:nth-child(4){animation-delay:.20s}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+.stat-card::before{
+  content:'';position:absolute;inset:0;
+  background:var(--card-gradient,linear-gradient(135deg,transparent,transparent));
+  opacity:.04;pointer-events:none;
+}
+.stat-card.green{--card-gradient:linear-gradient(135deg,#10b981,#059669)}
+.stat-card.indigo{--card-gradient:linear-gradient(135deg,#6366f1,#4f46e5)}
+.stat-card.amber{--card-gradient:linear-gradient(135deg,#f59e0b,#d97706)}
+.stat-card.rose{--card-gradient:linear-gradient(135deg,#f43f5e,#e11d48)}
+
+.stat-icon{
+  width:44px;height:44px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.3rem;margin-bottom:14px;
+}
+.stat-card.green  .stat-icon{background:rgba(16,185,129,.15)}
+.stat-card.indigo .stat-icon{background:rgba(99,102,241,.15)}
+.stat-card.amber  .stat-icon{background:rgba(245,158,11,.15)}
+.stat-card.rose   .stat-icon{background:rgba(244,63,94,.15)}
+
+.stat-value{font-family:'Syne',sans-serif;font-size:2.2rem;font-weight:800;color:var(--text);line-height:1}
+.stat-label{font-size:.82rem;color:var(--muted);margin-top:6px;font-weight:500}
+.stat-delta{
+  display:inline-flex;align-items:center;gap:4px;
+  margin-top:8px;padding:3px 10px;border-radius:20px;
+  font-size:.75rem;font-weight:700;
+}
+.stat-delta.up{background:rgba(16,185,129,.12);color:#059669}
+.stat-delta.down{background:rgba(244,63,94,.12);color:#e11d48}
+.stat-delta.neutral{background:rgba(100,116,139,.1);color:var(--muted)}
+
+/* ===== GRID LAYOUT ===== */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-bottom:22px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:22px;margin-bottom:22px}
+.span-2{grid-column:span 2}
+
+/* ===== CARDS ===== */
+.card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);padding:26px;
+  box-shadow:var(--shadow);
+  animation:slideUp .5s cubic-bezier(.16,1,.3,1) both;
+}
+.card-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:20px;
+}
+.card-title{
+  font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;
+  color:var(--text);display:flex;align-items:center;gap:8px;
+}
+.card-title .title-icon{
+  width:32px;height:32px;border-radius:9px;
+  background:var(--primary-light);
+  display:flex;align-items:center;justify-content:center;font-size:1rem;
+}
+.card-badge{
+  padding:4px 12px;border-radius:20px;
+  font-size:.73rem;font-weight:700;letter-spacing:.04em;
+  background:var(--primary-light);color:var(--primary-dark);
+}
+
+/* ===== CHART CONTAINERS ===== */
+.chart-wrap{position:relative;width:100%}
+.chart-wrap canvas{width:100%!important}
+
+/* ===== SUBJECT PERFORMANCE ===== */
+.subject-list{display:flex;flex-direction:column;gap:12px}
+.subject-row{
+  display:flex;align-items:center;gap:14px;
+  padding:12px 14px;border-radius:12px;
+  background:var(--surface2);border:1px solid var(--border);
+  transition:all .2s;
+}
+.subject-row:hover{border-color:var(--primary);background:var(--primary-light)}
+.subject-emoji{font-size:1.3rem;width:34px;text-align:center}
+.subject-name{flex:1;font-weight:600;font-size:.9rem;color:var(--text)}
+.subject-bar-wrap{width:120px}
+.subject-bar-bg{height:6px;background:var(--border);border-radius:6px;overflow:hidden}
+.subject-bar-fill{height:100%;border-radius:6px;transition:width .8s cubic-bezier(.16,1,.3,1)}
+.subject-score{font-weight:700;font-size:.9rem;min-width:40px;text-align:right}
+
+/* ===== WEAK AREAS ===== */
+.weak-grid{display:flex;flex-wrap:wrap;gap:10px}
+.weak-tag{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:9px 16px;border-radius:20px;
+  background:rgba(244,63,94,.08);border:1px solid rgba(244,63,94,.2);
+  color:var(--rose);font-size:.84rem;font-weight:600;
+  transition:all .2s;cursor:default;
+}
+.weak-tag:hover{background:rgba(244,63,94,.15);transform:scale(1.03)}
+.weak-tag .count{
+  background:var(--rose);color:white;
+  padding:1px 7px;border-radius:20px;font-size:.7rem;font-weight:800;
+}
+
+/* ===== AI INSIGHTS ===== */
+.insight-list{display:flex;flex-direction:column;gap:10px}
+.insight-item{
+  display:flex;align-items:flex-start;gap:12px;
+  padding:14px;border-radius:12px;
+  background:var(--surface2);border:1px solid var(--border);
+  animation:slideUp .4s both;
+}
+.insight-icon{
+  width:34px;height:34px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1rem;flex-shrink:0;
+}
+.insight-icon.tip   {background:rgba(5,150,105,.12)}
+.insight-icon.warn  {background:rgba(245,158,11,.12)}
+.insight-icon.alert {background:rgba(244,63,94,.12)}
+.insight-icon.star  {background:rgba(99,102,241,.12)}
+.insight-text{font-size:.88rem;color:var(--text2);line-height:1.5}
+.insight-text strong{color:var(--text)}
+
+/* ===== PREDICTION CARD ===== */
+.pred-display{
+  text-align:center;padding:20px;
+  border-radius:var(--radius-sm);
+  background:linear-gradient(135deg,var(--primary-light),rgba(99,102,241,.08));
+  border:1px solid var(--border);margin-bottom:16px;
+}
+.pred-score{
+  font-family:'Syne',sans-serif;font-size:3.5rem;font-weight:800;
+  background:linear-gradient(135deg,var(--primary),var(--accent));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+  line-height:1;
+}
+.pred-label{font-size:.85rem;color:var(--muted);margin-top:6px}
+.pred-trend{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  margin-top:12px;font-weight:600;font-size:.88rem;
+}
+.confidence-row{
+  display:flex;align-items:center;justify-content:space-between;
+  font-size:.82rem;color:var(--muted);
+}
+.confidence-bar{
+  flex:1;height:5px;background:var(--border);border-radius:5px;
+  margin:0 12px;overflow:hidden;
+}
+.confidence-fill{height:100%;border-radius:5px;background:linear-gradient(90deg,var(--primary),var(--accent))}
+
+/* ===== STUDY LOG ===== */
+.log-empty{
+  text-align:center;padding:30px;color:var(--muted);font-size:.9rem;
+}
+.log-grid{display:flex;flex-direction:column;gap:8px}
+.log-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 14px;border-radius:10px;
+  background:var(--surface2);border:1px solid var(--border);
+  font-size:.85rem;
+}
+.log-date{color:var(--muted)}
+.log-mins{
+  font-weight:700;color:var(--primary);
+  display:flex;align-items:center;gap:5px;
+}
+
+/* ===== HEAT CALENDAR ===== */
+.heat-wrap{display:flex;flex-wrap:wrap;gap:4px}
+.heat-day{
+  width:14px;height:14px;border-radius:3px;
+  background:var(--border);transition:all .2s;cursor:default;
+  position:relative;
+}
+.heat-day:hover::after{
+  content:attr(data-tip);
+  position:absolute;bottom:18px;left:50%;transform:translateX(-50%);
+  background:var(--text);color:var(--bg);
+  padding:3px 7px;border-radius:6px;font-size:.65rem;white-space:nowrap;z-index:10;
+}
+.heat-day.h1{background:rgba(5,150,105,.25)}
+.heat-day.h2{background:rgba(5,150,105,.5)}
+.heat-day.h3{background:rgba(5,150,105,.75)}
+.heat-day.h4{background:#059669}
+
+/* ===== EMPTY STATES ===== */
+.empty{
+  text-align:center;padding:40px 20px;
+  color:var(--muted);
+}
+.empty .empty-icon{font-size:2.5rem;margin-bottom:10px}
+.empty p{font-size:.88rem}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:900px){
+  .hero-stats{grid-template-columns:1fr 1fr}
+  .grid-2,.grid-3{grid-template-columns:1fr}
+  .span-2{grid-column:1}
+  main{padding:24px 18px}
+  .topbar{padding:14px 18px}
+}
+@media(max-width:560px){
+  .hero-stats{grid-template-columns:1fr}
+  .stat-value{font-size:1.8rem}
+}
+</style>
+</head>
+<body>
+
+<div class="bg-canvas">
+  <div class="bg-blob"></div>
+  <div class="bg-blob"></div>
+  <div class="bg-blob"></div>
+</div>
+
+<!-- TOPBAR -->
+<nav class="topbar">
+  <div class="topbar-left">
+    <button class="back-btn" onclick="window.location.href='dashboard.html'">← Dashboard</button>
+    <div>
+      <div class="page-title">📊 Analytics</div>
+      <div class="page-subtitle">Your full learning overview</div>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <a href="compiler.html" style="display:flex;align-items:center;gap:6px;padding:9px 16px;border-radius:12px;background:var(--primary);color:white;text-decoration:none;font-weight:700;font-size:.84rem;transition:all .2s;" onmouseover="this.style.background='var(--primary-dark)'" onmouseout="this.style.background='var(--primary)'">⌨️ Code Lab</a>
+    <div class="date-chip" id="dateChip"></div>
+    <button class="refresh-btn" onclick="location.reload()">↻ Refresh</button>
+  </div>
+</nav>
+
+<main>
+
+  <!-- HERO STATS -->
+  <div class="hero-stats" style="grid-template-columns:repeat(5,1fr)">
+    <div class="stat-card green">
+      <div class="stat-icon">📝</div>
+      <div class="stat-value" id="statQuizzes">0</div>
+      <div class="stat-label">Quizzes Taken</div>
+      <div class="stat-delta neutral" id="statQuizDelta">—</div>
+    </div>
+    <div class="stat-card indigo">
+      <div class="stat-icon">🎯</div>
+      <div class="stat-value" id="statAvg">—</div>
+      <div class="stat-label">Average Score</div>
+      <div class="stat-delta neutral" id="statAvgDelta">—</div>
+    </div>
+    <div class="stat-card amber">
+      <div class="stat-icon">⏱</div>
+      <div class="stat-value" id="statTime">0 min</div>
+      <div class="stat-label">Study Time</div>
+      <div class="stat-delta neutral" id="statTimeDelta">—</div>
+    </div>
+    <div class="stat-card" style="--card-gradient:linear-gradient(135deg,#06b6d4,#0284c7)">
+      <div class="stat-icon" style="background:rgba(6,182,212,.15)">⌨️</div>
+      <div class="stat-value" id="statCoding" style="color:var(--sky)">0 min</div>
+      <div class="stat-label">Coding Time</div>
+      <div class="stat-delta neutral" id="statCodingDelta">—</div>
+    </div>
+    <div class="stat-card rose">
+      <div class="stat-icon">⚠️</div>
+      <div class="stat-value" id="statWeak">0</div>
+      <div class="stat-label">Weak Areas</div>
+      <div class="stat-delta neutral" id="statWeakDelta">Focus needed</div>
+    </div>
+  </div>
+
+  <!-- ROW 1: Score trend + Subject breakdown -->
+  <div class="grid-2">
+    <div class="card" style="animation-delay:.1s">
+      <div class="card-header">
+        <div class="card-title"><span class="title-icon">📈</span> Score Trend</div>
+        <span class="card-badge" id="trendBadge">—</span>
+      </div>
+      <div class="chart-wrap" style="height:200px">
+        <canvas id="scoreChart"></canvas>
+      </div>
+    </div>
+
+    <div class="card" style="animation-delay:.15s">
+      <div class="card-header">
+        <div class="card-title"><span class="title-icon">📚</span> Subject Performance</div>
+      </div>
+      <div id="subjectList" class="subject-list"></div>
+    </div>
+  </div>
+
+  <!-- ROW 2: Study time bar + Coding time bar -->
+  <div class="grid-2">
+    <div class="card" style="animation-delay:.2s">
+      <div class="card-header">
+        <div class="card-title"><span class="title-icon">📅</span> Study Activity</div>
+      </div>
+      <div class="chart-wrap" style="height:200px">
+        <canvas id="timeChart"></canvas>
+      </div>
+    </div>
+
+    <div class="card" style="animation-delay:.22s">
+      <div class="card-header">
+        <div class="card-title"><span class="title-icon">⌨️</span> Coding Time (AI Code Lab)</div>
+        <a href="compiler.html" style="padding:4px 12px;border-radius:20px;font-size:.73rem;font-weight:700;background:rgba(6,182,212,.12);color:var(--sky);text-decoration:none;border:1px solid rgba(6,182,212,.25);">Open Lab →</a>
+      </div>
+      <div class="chart-wrap" style="height:200px">
+        <canvas id="codingChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROW 2b: Prediction -->
+  <div class="grid-2" style="margin-top:0">
+    <div class="card" style="animation-delay:.25s">
+      <div class="card-header">
+        <div class="card-title"><span class="title-icon">🔮</span> AI Prediction</div>
+        <span class="card-badge">Linear Regression</span>
+      </div>
+      <div id="predContent"></div>
+    </div>
+
+    <div class="card" style="animation-delay:.27s">
+      <div class="card-header">
+        <div class="card-title"><span class="title-icon">💻</span> Coding Session Log</div>
+      </div>
+      <div id="codingLog"></div>
+    </div>
+  </div>
+
+  <!-- ROW 3: Weak areas + AI Insights -->
+  <div class="grid-2">
+    <div class="card" style="animation-delay:.3s">
+      <div class="card-header">
+        <div class="card-title"><span class="title-icon">⚠️</span> Weak Areas</div>
+      </div>
+      <div class="weak-grid" id="weakGrid"></div>
+    </div>
+
+    <div class="card" style="animation-delay:.35s">
+      <div class="card-header">
+        <div class="card-title"><span class="title-icon">🧠</span> AI Insights</div>
+      </div>
+      <div class="insight-list" id="insightList"></div>
+    </div>
+  </div>
+
+  <!-- ROW 4: Full-width radar + Study log -->
+  <div class="grid-2">
+    <div class="card" style="animation-delay:.4s">
+      <div class="card-header">
+        <div class="card-title"><span class="title-icon">🕷️</span> Subject Radar</div>
+      </div>
+      <div class="chart-wrap" style="height:260px">
+        <canvas id="radarChart"></canvas>
+      </div>
+    </div>
+
+    <div class="card" style="animation-delay:.45s">
+      <div class="card-header">
+        <div class="card-title"><span class="title-icon">📖</span> Recent Study Log</div>
+      </div>
+      <div id="studyLog"></div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+// ===== THEME SYNC =====
+const savedTheme = localStorage.getItem('theme') || 'light';
+document.documentElement.setAttribute('data-theme', savedTheme);
+
+// ===== DATE CHIP =====
+document.getElementById('dateChip').textContent =
+  new Date().toLocaleDateString('en-IN', { weekday:'short', day:'numeric', month:'short', year:'numeric' });
+
+// ===== LOAD DATA =====
+const history = JSON.parse(localStorage.getItem('sb_quiz_history') || '[]');
+
+// sb_weak_areas may be:
+//   new format → array of {topic, count}  (written by quiz.js & app.js)
+//   old format → object {topic: count}   (legacy)
+//   missing    → derive from quiz history
+let weak = [];
+try {
+  const raw = JSON.parse(localStorage.getItem('sb_weak_areas') || 'null');
+  if (Array.isArray(raw)) {
+    weak = raw;  // ✅ new format
+  } else if (raw && typeof raw === 'object') {
+    // Convert legacy object to array
+    weak = Object.entries(raw).map(([topic, count]) => ({ topic, count }))
+                              .sort((a, b) => b.count - a.count);
+  }
+} catch (_) {}
+
+// If still empty, derive from quiz history
+if (!weak.length && history.length) {
+  const topicMap = {};
+  history.forEach(q => {
+    (q.weakTopics || []).forEach(t => {
+      topicMap[t] = (topicMap[t] || 0) + 1;
+    });
+  });
+  weak = Object.entries(topicMap).map(([topic, count]) => ({ topic, count }))
+                                  .sort((a, b) => b.count - a.count);
+}
+
+const study   = JSON.parse(localStorage.getItem('sb_study_log')    || '[]');
+const user    = JSON.parse(localStorage.getItem('sb_current_user') || localStorage.getItem('sb_user') || '{}');
+let codingLog = [];
+try { codingLog = JSON.parse(localStorage.getItem('sb_coding_log') || '[]'); } catch {}
+
+// ===== CHART.JS DEFAULTS =====
+const isDark = savedTheme === 'dark';
+const textColor  = isDark ? '#cbd5e1' : '#334155';
+const gridColor  = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
+const primaryGreen = '#059669';
+const accentIndigo = '#6366f1';
+
+Chart.defaults.font.family = "'DM Sans', sans-serif";
+Chart.defaults.color = textColor;
+
+// ===== HERO STATS =====
+const quizCount = history.length;
+document.getElementById('statQuizzes').textContent = quizCount;
+
+const avg = quizCount
+  ? Math.round(history.reduce((a, b) => a + b.score, 0) / quizCount)
+  : null;
+document.getElementById('statAvg').textContent = avg !== null ? avg + '%' : '—';
+
+const totalMins = study.reduce((a, b) => a + (b.minutes || 0), 0);
+document.getElementById('statTime').textContent = totalMins >= 60
+  ? `${Math.floor(totalMins/60)}h ${totalMins%60}m`
+  : totalMins + ' min';
+
+const totalCodingMins = codingLog.reduce((a, b) => a + (b.minutes || 0), 0);
+const codingEl = document.getElementById('statCoding');
+codingEl.textContent = totalCodingMins >= 60
+  ? `${Math.floor(totalCodingMins/60)}h ${totalCodingMins%60}m`
+  : totalCodingMins + ' min';
+const codingDeltaEl = document.getElementById('statCodingDelta');
+codingDeltaEl.textContent = totalCodingMins === 0 ? '🖥 Open Code Lab' : totalCodingMins >= 60 ? '🔥 Great session!' : '⌨️ Keep coding!';
+codingDeltaEl.className = 'stat-delta ' + (totalCodingMins >= 60 ? 'up' : totalCodingMins > 0 ? 'neutral' : 'neutral');
+
+document.getElementById('statWeak').textContent = weak.length;
+
+// Trend badge
+const trendBadge = document.getElementById('trendBadge');
+if (quizCount >= 3) {
+  const last3 = history.slice(-3).map(q => q.score);
+  const trend = last3[2] - last3[0];
+  trendBadge.textContent = trend > 5 ? '↑ Improving' : trend < -5 ? '↓ Declining' : '→ Stable';
+  trendBadge.style.background = trend > 5 ? 'rgba(5,150,105,.12)' : trend < -5 ? 'rgba(244,63,94,.12)' : '';
+  trendBadge.style.color      = trend > 5 ? '#059669'              : trend < -5 ? '#f43f5e'              : '';
+} else {
+  trendBadge.textContent = quizCount + ' quizzes';
+}
+
+// Avg delta
+if (avg !== null) {
+  const el = document.getElementById('statAvgDelta');
+  el.textContent = avg >= 75 ? '🔥 On Track' : avg >= 50 ? '📈 Keep Going' : '📚 Needs Work';
+  el.className = 'stat-delta ' + (avg >= 75 ? 'up' : avg >= 50 ? 'neutral' : 'down');
+}
+
+// Weak delta
+const weakDelta = document.getElementById('statWeakDelta');
+weakDelta.textContent = weak.length === 0 ? '✅ All clear!' : weak.length <= 2 ? 'Manageable' : 'Needs attention';
+weakDelta.className = 'stat-delta ' + (weak.length === 0 ? 'up' : weak.length <= 2 ? 'neutral' : 'down');
+
+// ===== SCORE TREND CHART =====
+const scoreCtx = document.getElementById('scoreChart').getContext('2d');
+if (history.length > 0) {
+  const gradient = scoreCtx.createLinearGradient(0, 0, 0, 200);
+  gradient.addColorStop(0, 'rgba(5,150,105,0.28)');
+  gradient.addColorStop(1, 'rgba(5,150,105,0)');
+
+  new Chart(scoreCtx, {
+    type: 'line',
+    data: {
+      labels: history.map((_, i) => 'Quiz ' + (i + 1)),
+      datasets: [{
+        label: 'Score %',
+        data: history.map(q => q.score),
+        borderColor: primaryGreen,
+        backgroundColor: gradient,
+        tension: 0.45,
+        fill: true,
+        pointBackgroundColor: primaryGreen,
+        pointBorderColor: '#fff',
+        pointBorderWidth: 2,
+        pointRadius: 5,
+        pointHoverRadius: 7
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { color: gridColor }, ticks: { color: textColor, font: { size: 11 } } },
+        y: {
+          min: 0, max: 100,
+          grid: { color: gridColor },
+          ticks: { color: textColor, callback: v => v + '%', font: { size: 11 } }
+        }
+      }
+    }
+  });
+} else {
+  scoreCtx.canvas.parentElement.innerHTML = '<div class="empty"><div class="empty-icon">📝</div><p>Take a quiz to see your score trend</p></div>';
+}
+
+// ===== SUBJECT PERFORMANCE =====
+const subjectMap = {};
+history.forEach(q => {
+  const s = q.subject || 'Unknown';
+  if (!subjectMap[s]) subjectMap[s] = { total: 0, count: 0 };
+  subjectMap[s].total += q.score;
+  subjectMap[s].count++;
+});
+const subjects     = Object.keys(subjectMap);
+const subjectScores = subjects.map(s => Math.round(subjectMap[s].total / subjectMap[s].count));
+
+const subjectEmojis = { c:'💻', ai:'🤖', fe:'🌐', os:'🐧' };
+const subjectListEl = document.getElementById('subjectList');
+
+if (subjects.length) {
+  subjects.forEach((s, i) => {
+    const pct = subjectScores[i];
+    const barColor = pct >= 75 ? primaryGreen : pct >= 50 ? '#f59e0b' : '#f43f5e';
+    subjectListEl.innerHTML += `
+      <div class="subject-row">
+        <span class="subject-emoji">${subjectEmojis[s] || '📚'}</span>
+        <span class="subject-name">${s.toUpperCase()}</span>
+        <div class="subject-bar-wrap">
+          <div class="subject-bar-bg">
+            <div class="subject-bar-fill" style="width:${pct}%;background:${barColor}"></div>
+          </div>
+        </div>
+        <span class="subject-score" style="color:${barColor}">${pct}%</span>
+      </div>`;
+  });
+} else {
+  subjectListEl.innerHTML = '<div class="empty"><div class="empty-icon">📚</div><p>No subject data yet</p></div>';
+}
+
+// ===== STUDY TIME CHART =====
+const timeCtx = document.getElementById('timeChart').getContext('2d');
+if (study.length > 0) {
+  new Chart(timeCtx, {
+    type: 'bar',
+    data: {
+      labels: study.slice(-7).map(s => s.date || '—'),
+      datasets: [{
+        label: 'Minutes',
+        data: study.slice(-7).map(s => s.minutes || 0),
+        backgroundColor: (ctx) => {
+          const v = ctx.parsed.y;
+          return v >= 60 ? 'rgba(5,150,105,0.85)' : v >= 30 ? 'rgba(99,102,241,0.75)' : 'rgba(245,158,11,0.75)';
+        },
+        borderRadius: 8,
+        borderSkipped: false
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { display: false }, ticks: { color: textColor, font: { size: 10 } } },
+        y: { grid: { color: gridColor }, ticks: { color: textColor, callback: v => v + 'm', font: { size: 11 } } }
+      }
+    }
+  });
+} else {
+  // Demo data if none
+  new Chart(timeCtx, {
+    type: 'bar',
+    data: {
+      labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+      datasets: [{
+        label: 'Minutes (demo)',
+        data: [0,0,0,0,0,0,0],
+        backgroundColor: 'rgba(5,150,105,0.2)',
+        borderRadius: 8,
+        borderSkipped: false
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { display: false }, ticks: { color: textColor, font: { size: 11 } } },
+        y: { min: 0, max: 60, grid: { color: gridColor }, ticks: { color: textColor, callback: v => v + 'm' } }
+      }
+    }
+  });
+}
+
+// ===== RADAR CHART =====
+const radarCtx = document.getElementById('radarChart').getContext('2d');
+const radarLabels = subjects.length ? subjects.map(s => s.toUpperCase()) : ['C','AI','FE','OS'];
+const radarData   = subjectScores.length ? subjectScores : [0,0,0,0];
+
+new Chart(radarCtx, {
+  type: 'radar',
+  data: {
+    labels: radarLabels,
+    datasets: [{
+      label: 'Score %',
+      data: radarData,
+      borderColor: primaryGreen,
+      backgroundColor: 'rgba(5,150,105,0.12)',
+      pointBackgroundColor: primaryGreen,
+      pointBorderColor: '#fff',
+      pointBorderWidth: 2,
+      pointRadius: 5
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      r: {
+        min: 0, max: 100,
+        grid: { color: gridColor },
+        angleLines: { color: gridColor },
+        ticks: { display: false },
+        pointLabels: { color: textColor, font: { size: 12, weight: '600' } }
+      }
+    }
+  }
+});
+
+// ===== WEAK AREAS =====
+const weakGrid = document.getElementById('weakGrid');
+if (weak.length) {
+  weak.slice(0, 12).forEach(w => {
+    weakGrid.innerHTML += `<div class="weak-tag">${w.topic} <span class="count">${w.count}</span></div>`;
+  });
+} else {
+  weakGrid.innerHTML = '<div class="empty"><div class="empty-icon">🚀</div><p>No weak areas detected — keep it up!</p></div>';
+}
+
+// ===== AI INSIGHTS =====
+const insightList = document.getElementById('insightList');
+const insights = [];
+
+if (avg === null) {
+  insights.push({ icon: '🎯', type: 'tip',  text: 'Take your first quiz to get personalized insights!' });
+} else {
+  if (avg >= 80) insights.push({ icon: '⭐', type: 'star', text: `<strong>Excellent!</strong> Your ${avg}% average shows strong mastery.` });
+  else if (avg >= 60) insights.push({ icon: '📈', type: 'tip', text: `<strong>Good progress!</strong> Average is ${avg}%. Push to 80%+ by reviewing missed concepts.` });
+  else insights.push({ icon: '⚠️', type: 'warn', text: `<strong>Low average (${avg}%)</strong> — revisit fundamentals before tackling harder topics.` });
+}
+
+if (weak.length > 0) {
+  insights.push({ icon: '🔍', type: 'alert', text: `Focus on <strong>"${weak[0].topic}"</strong> — it's your most frequently missed topic.` });
+}
+
+subjects.forEach((s, i) => {
+  if (subjectScores[i] < 55) {
+    insights.push({ icon: '📚', type: 'warn', text: `<strong>${s.toUpperCase()}</strong> score is ${subjectScores[i]}% — dedicate extra time this week.` });
+  } else if (subjectScores[i] >= 85) {
+    insights.push({ icon: '🏆', type: 'star', text: `<strong>${s.toUpperCase()}</strong> — ${subjectScores[i]}%! You're excelling here.` });
+  }
+});
+
+if (totalMins < 30) {
+  insights.push({ icon: '⏰', type: 'alert', text: 'Logged study time is very low. Try logging at least 30 min/day to build consistency.' });
+} else if (totalMins >= 120) {
+  insights.push({ icon: '🔥', type: 'tip', text: `${totalMins} min logged! Great study habit — consistency is key.` });
+}
+
+if (!insights.length) {
+  insights.push({ icon: '💡', type: 'tip', text: 'Keep taking quizzes and logging study time for personalized AI insights.' });
+}
+
+insights.slice(0, 5).forEach((ins, i) => {
+  insightList.innerHTML += `
+    <div class="insight-item" style="animation-delay:${.1 + i*.07}s">
+      <div class="insight-icon ${ins.type}">${ins.icon}</div>
+      <div class="insight-text">${ins.text}</div>
+    </div>`;
+});
+
+// ===== LINEAR REGRESSION PREDICTION =====
+function linearRegression(x, y) {
+  const n = x.length;
+  const sumX  = x.reduce((a, b) => a + b, 0);
+  const sumY  = y.reduce((a, b) => a + b, 0);
+  const sumXY = x.reduce((s, xi, i) => s + xi * y[i], 0);
+  const sumXX = x.reduce((s, xi) => s + xi * xi, 0);
+  const slope     = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX || 1);
+  const intercept = (sumY - slope * sumX) / n;
+  return { slope, intercept };
+}
+
+const predContent = document.getElementById('predContent');
+
+if (history.length >= 4) {
+  const x = history.map((_, i) => i + 1);
+  const y = history.map(q => q.score);
+  const { slope, intercept } = linearRegression(x, y);
+  const nextX = x.length + 1;
+  const predicted = Math.max(0, Math.min(100, Math.round(slope * nextX + intercept)));
+
+  const mean = y.reduce((a, b) => a + b, 0) / y.length;
+  const variance = y.reduce((s, v) => s + (v - mean) ** 2, 0) / y.length;
+  const confidence = variance < 50 ? 'High' : variance < 150 ? 'Medium' : 'Low';
+  const confPct    = variance < 50 ? 90     : variance < 150 ? 65       : 40;
+
+  const trendText = slope > 2 ? '🚀 Strong upward trend!' : slope > 0.5 ? '📈 Improving steadily' : slope < -2 ? '⚠️ Declining' : '📊 Stable performance';
+  const trendColor = slope > 0.5 ? primaryGreen : slope < -1 ? '#f43f5e' : '#f59e0b';
+
+  predContent.innerHTML = `
+    <div class="pred-display">
+      <div class="pred-score">${predicted}%</div>
+      <div class="pred-label">Predicted next quiz score</div>
+      <div class="pred-trend" style="color:${trendColor}">${trendText}</div>
+    </div>
+    <div class="confidence-row">
+      <span>Confidence: <strong>${confidence}</strong></span>
+      <div class="confidence-bar"><div class="confidence-fill" style="width:${confPct}%"></div></div>
+      <span>${confPct}%</span>
+    </div>
+    <p style="font-size:.78rem;color:var(--muted);margin-top:12px">Based on ${history.length} quiz results using linear regression</p>`;
+} else {
+  predContent.innerHTML = `
+    <div class="empty">
+      <div class="empty-icon">🔮</div>
+      <p>Take at least <strong>4 quizzes</strong> to unlock AI score prediction</p>
+      <p style="margin-top:6px;font-size:.8rem">${history.length}/4 completed</p>
+    </div>`;
+}
+
+// ===== STUDY LOG =====
+const studyLogEl = document.getElementById('studyLog');
+if (study.length) {
+  studyLogEl.innerHTML = '<div class="log-grid">' + study.slice(-6).reverse().map(s => `
+    <div class="log-row">
+      <span class="log-date">${s.date || 'Unknown'}</span>
+      <span class="log-mins">⏱ ${s.minutes || 0} min</span>
+    </div>`).join('') + '</div>';
+} else {
+  studyLogEl.innerHTML = `<div class="empty"><div class="empty-icon">📖</div><p>No study sessions logged yet.<br>Start a Pomodoro timer to track your time!</p></div>`;
+}
+
+// ===== CODING TIME CHART =====
+const codingCtx = document.getElementById('codingChart').getContext('2d');
+if (codingLog.length > 0) {
+  const recentCoding = codingLog.slice(-7);
+  const codingGradient = codingCtx.createLinearGradient(0, 0, 0, 200);
+  codingGradient.addColorStop(0, 'rgba(6,182,212,0.7)');
+  codingGradient.addColorStop(1, 'rgba(6,182,212,0.15)');
+  new Chart(codingCtx, {
+    type: 'bar',
+    data: {
+      labels: recentCoding.map(s => s.date || '—'),
+      datasets: [{
+        label: 'Coding Minutes',
+        data: recentCoding.map(s => s.minutes || 0),
+        backgroundColor: codingGradient,
+        borderRadius: 8,
+        borderSkipped: false
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { display: false }, ticks: { color: textColor, font: { size: 10 } } },
+        y: { grid: { color: gridColor }, ticks: { color: textColor, callback: v => v + 'm', font: { size: 11 } } }
+      }
+    }
+  });
+} else {
+  codingCtx.canvas.parentElement.innerHTML = `
+    <div class="empty" style="height:200px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;">
+      <div class="empty-icon">⌨️</div>
+      <p style="color:var(--muted);font-size:.88rem;text-align:center">No coding sessions yet.<br>Open the AI Code Lab to start coding!</p>
+      <a href="compiler.html" style="margin-top:8px;padding:8px 18px;border-radius:10px;background:var(--sky, #0ea5e9);color:white;text-decoration:none;font-weight:700;font-size:.82rem;">Open Code Lab →</a>
+    </div>`;
+}
+
+// ===== CODING SESSION LOG =====
+const codingLogEl = document.getElementById('codingLog');
+if (codingLog.length) {
+  codingLogEl.innerHTML = '<div class="log-grid">' + codingLog.slice(-6).reverse().map(s => `
+    <div class="log-row">
+      <span class="log-date">${s.date || 'Unknown'}</span>
+      <span class="log-mins" style="color:var(--sky,#0ea5e9)">⌨️ ${s.minutes || 0} min</span>
+    </div>`).join('') + '</div>';
+} else {
+  codingLogEl.innerHTML = `<div class="empty"><div class="empty-icon">💻</div><p style="text-align:center;color:var(--muted);font-size:.88rem">No coding sessions logged yet.<br>Spend time in AI Code Lab to track your coding hours!</p></div>`;
+}
+</script>
+</body>
+</html>

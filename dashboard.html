@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <link rel="icon" type="image/png" href="logo.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StudyBuddy</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="bg-mesh"></div>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <a href="#top" class="nav-logo">
+    <img src="logo.png" alt="StudyBuddy Logo" style="height: 42px; object-fit: contain;">
+    StudyBuddy
+  </a>
+  <ul class="nav-links">
+  <li><a href="dashboard.html">Hub</a></li>
+  <li><a href="#about" class="nav-about">About</a></li>
+  <li><a href="notes.html">Learnings</a></li>
+  <li><a href="analytics.html">Analytics</a></li>
+  <li><a href="quiz.html">Quiz</a></li>
+  <li><a href="compiler.html">Code Lab</a></li>
+  <li><a href="resources.html">Resources</a></li>
+</ul>
+  <div class="nav-right">
+    <div id="clock"></div>
+
+    <!-- PROFILE SECTION -->
+    <div class="profile-wrap" id="profileWrap">
+      <button class="profile-btn" onclick="toggleProfile()" id="profileBtn">
+        <div class="profile-avatar" id="profileAvatar">KS</div>
+        <span class="profile-name-short" id="profileNameShort">Krishna</span>
+        <span class="profile-chevron">▼</span>
+      </button>
+      <div class="profile-dropdown" id="profileDropdown">
+        <div class="profile-dropdown-header">
+          <div class="pd-name">
+            <span id="pdFullName">Krishna Sharma</span>
+            <span class="pd-online-dot"></span>
+          </div>
+          <div class="pd-email" id="pdEmail">2510990xxx@chitkara.edu.in</div>
+          <div class="pd-role" id="pdRole"></div>
+        </div>
+        <button class="pd-item" onclick="openSettings()">
+          <span class="pd-icon">⚙️</span>
+          Settings
+        </button>
+        <div class="pd-divider"></div>
+        <button class="pd-item logout" onclick="handleLogout()">
+          <span class="pd-icon">🚪</span>
+          Log Out
+        </button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- TICKER -->
+<div class="ticker-wrap">
+  <div class="ticker-title">📅 Today</div>
+  <div class="ticker-scroll">
+    <div class="ticker-inner" id="tickerInner">
+      <!-- JS fills this -->
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div class="settings-modal" id="settingsModal" onclick="if(event.target===this)closeSettings()">
+  <div class="settings-modal-content">
+    <button class="close-btn" onclick="closeSettings()" style="position:absolute;right:16px;top:16px;">✕</button>
+    <div class="settings-title">⚙️ Settings</div>
+
+    <div class="settings-shell">
+      <aside class="settings-nav" role="tablist" aria-label="Settings sections">
+        <button class="settings-tab active" id="tab_profile" onclick="openSettingsTab('profile')" role="tab" aria-selected="true">👤 Profile</button>
+        <button class="settings-tab" id="tab_appearance" onclick="openSettingsTab('appearance')" role="tab" aria-selected="false">🎨 Appearance</button>
+        <button class="settings-tab" id="tab_productivity" onclick="openSettingsTab('productivity')" role="tab" aria-selected="false">📅 Productivity</button>
+        <button class="settings-tab" id="tab_timetable" onclick="openSettingsTab('timetable')" role="tab" aria-selected="false">🗓️ Timetable</button>
+        <button class="settings-tab" id="tab_system" onclick="openSettingsTab('system')" role="tab" aria-selected="false">🔒 System</button>
+      </aside>
+
+      <section class="settings-body">
+        <!-- PROFILE -->
+        <div class="settings-panel active" id="panel_profile" role="tabpanel" aria-labelledby="tab_profile">
+          <div class="settings-panel-title">Profile</div>
+
+          <div class="settings-profile-row">
+            <div class="settings-avatar-preview" id="settingsAvatarPreview" aria-hidden="true"></div>
+            <div style="flex:1">
+              <div class="settings-grid">
+                <div class="settings-field">
+                  <label class="settings-label" for="settingsName">Full name</label>
+                  <input class="settings-input-2" id="settingsName" placeholder="Your name">
+                </div>
+                <div class="settings-field">
+                  <label class="settings-label" for="settingsEmail">Email</label>
+                  <input class="settings-input-2" id="settingsEmail" type="email" placeholder="you@email.com">
+                </div>
+              </div>
+              <div class="settings-field" style="margin-top:12px;">
+                <label class="settings-label" for="settingsPhoto">Profile image</label>
+                <input class="settings-input-2" id="settingsPhoto" type="file" accept="image/*">
+                <div class="settings-hint">Stored locally in your browser (base64). Falls back to initials if removed.</div>
+              </div>
+              <div class="settings-actions-row">
+                <button class="btn btn-ghost" type="button" onclick="clearProfilePhoto()">Remove photo</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- APPEARANCE -->
+        <div class="settings-panel" id="panel_appearance" role="tabpanel" aria-labelledby="tab_appearance">
+          <div class="settings-panel-title">Appearance <span class="auto-badge" id="appearanceAutoBadge" style="display:none">AUTO</span></div>
+
+          <div class="settings-panel-subtitle">Color mode</div>
+          <div class="segmented">
+            <button type="button" class="seg-btn" id="modeBtn_light" onclick="setColorMode('light'); syncAppearanceUI()">Light</button>
+            <button type="button" class="seg-btn" id="modeBtn_dark" onclick="setColorMode('dark'); syncAppearanceUI()">Dark</button>
+            <button type="button" class="seg-btn" id="modeBtn_auto" onclick="setColorMode('auto'); syncAppearanceUI()">Auto</button>
+          </div>
+
+          <div class="settings-panel-subtitle">Accent color</div>
+          <div class="accent-row">
+            <input class="settings-input-2" id="accentHex" placeholder="#059669" maxlength="7">
+            <button class="btn btn-primary" type="button" onclick="applyAccentFromUI()">Apply</button>
+          </div>
+          <div class="accent-presets">
+            <button class="accent-dot" style="--dot:#059669" type="button" onclick="quickAccent('#059669')"></button>
+            <button class="accent-dot" style="--dot:#2563eb" type="button" onclick="quickAccent('#2563eb')"></button>
+            <button class="accent-dot" style="--dot:#7c3aed" type="button" onclick="quickAccent('#7c3aed')"></button>
+            <button class="accent-dot" style="--dot:#ef4444" type="button" onclick="quickAccent('#ef4444')"></button>
+            <button class="accent-dot" style="--dot:#f59e0b" type="button" onclick="quickAccent('#f59e0b')"></button>
+          </div>
+          <div class="settings-hint">Accent affects buttons, highlights, and progress gradients.</div>
+        </div>
+
+        <!-- PRODUCTIVITY -->
+        <div class="settings-panel" id="panel_productivity" role="tabpanel" aria-labelledby="tab_productivity">
+          <div class="settings-panel-title">Productivity</div>
+
+          <div class="settings-grid">
+            <div class="settings-field">
+              <label class="settings-label" for="settingsDailyGoal">Daily study goal (minutes)</label>
+              <input class="settings-input-2" id="settingsDailyGoal" type="number" min="0" step="5" placeholder="60">
+            </div>
+            <div class="settings-field">
+              <label class="settings-label" for="settingsExamDate">Exam target date</label>
+              <input class="settings-input-2" id="settingsExamDate" type="date">
+            </div>
+          </div>
+
+          <div class="toggle-row">
+            <div>
+              <div class="settings-row-label">Reminders</div>
+              <div class="settings-row-sub">Enable gentle nudges based on your goal</div>
+            </div>
+            <button type="button" class="toggle" id="settingsReminders" aria-pressed="false" onclick="toggleReminders()">
+              <span class="knob"></span>
+            </button>
+          </div>
+        </div>
+
+        <!-- TIMETABLE -->
+        <div class="settings-panel" id="panel_timetable" role="tabpanel" aria-labelledby="tab_timetable">
+          <div class="settings-panel-title">Weekly Timetable</div>
+          <div class="settings-hint">Upload a photo or PDF of your weekly timetable. StudyBuddy AI will read it and automatically update your class schedule ticker.</div>
+
+          <div id="ttUploadArea" style="margin-top:16px;border:2px dashed var(--surface-border);border-radius:16px;padding:32px 20px;text-align:center;cursor:pointer;transition:border-color .2s,background .2s;" onclick="document.getElementById('ttFileInput').click()" ondragover="event.preventDefault();this.style.borderColor='var(--primary)'" ondragleave="this.style.borderColor='var(--surface-border)'" ondrop="handleTtDrop(event)">
+            <div style="font-size:2rem;margin-bottom:8px;">📅</div>
+            <div style="font-weight:700;color:var(--text);margin-bottom:4px;">Drop your timetable here</div>
+            <div style="font-size:0.8rem;color:var(--text-muted);">Supports JPG, PNG, PDF — max 10 MB</div>
+          </div>
+          <input type="file" id="ttFileInput" accept="image/*,application/pdf" style="display:none" onchange="handleTtUpload(this.files[0])">
+
+          <div id="ttPreviewWrap" style="display:none;margin-top:14px;">
+            <img id="ttPreviewImg" style="max-width:100%;border-radius:12px;border:1px solid var(--surface-border);" alt="Timetable preview">
+            <div style="font-size:0.78rem;color:var(--text-muted);margin-top:6px;" id="ttFileName"></div>
+          </div>
+
+          <div id="ttStatus" style="display:none;margin-top:14px;padding:12px 16px;border-radius:12px;font-size:0.85rem;font-weight:600;"></div>
+
+          <div id="ttSchedulePreview" style="display:none;margin-top:16px;">
+            <div style="font-weight:700;color:var(--text);margin-bottom:10px;font-size:.9rem;">📋 Parsed Schedule</div>
+            <div id="ttDayList" style="display:flex;flex-direction:column;gap:8px;max-height:260px;overflow-y:auto;"></div>
+          </div>
+
+          <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;">
+            <button class="btn btn-primary" id="ttParseBtn" onclick="parseTimetableWithAI()" style="display:none;">🤖 Extract with AI</button>
+            <button class="btn btn-primary" id="ttSaveBtn" onclick="saveTimetable()" style="display:none;">✅ Save & Apply</button>
+            <button class="btn btn-ghost" onclick="clearTimetable()" style="font-size:.82rem;">🗑 Clear Timetable</button>
+          </div>
+        </div>
+
+        <!-- SYSTEM -->
+        <div class="settings-panel" id="panel_system" role="tabpanel" aria-labelledby="tab_system">
+          <div class="settings-panel-title">System</div>
+
+          <div class="settings-hint">These actions affect your local browser data.</div>
+          <div class="system-actions">
+            <button class="btn btn-primary" type="button" onclick="handleLogout()">Log out</button>
+            <button class="btn btn-ghost" type="button" onclick="resetAllData()">Reset all data</button>
+          </div>
+        </div>
+
+        <button class="settings-save-btn" onclick="saveSettings()">Save Changes ✓</button>
+        <div class="settings-status" id="settingsStatus" aria-live="polite"></div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<!-- HERO -->
+<section class="hero" id="top">
+  <div class="hero-logo-wrap">
+    <svg class="hero-logo" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#059669"/>
+          <stop offset="100%" stop-color="#6366f1"/>
+        </linearGradient>
+        <linearGradient id="g2" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#059669"/>
+          <stop offset="100%" stop-color="#06b6d4"/>
+        </linearGradient>
+      </defs>
+      <path d="M30 130 Q50 80 100 75 Q150 80 170 130 L170 155 Q150 135 100 130 Q50 135 30 155 Z" fill="url(#g2)" opacity="0.85"/>
+      <path d="M30 120 Q50 70 100 65 Q150 70 170 120 L170 145 Q150 125 100 120 Q50 125 30 145 Z" fill="url(#g1)" opacity="0.6"/>
+      <path d="M35 115 Q55 65 100 60 Q145 65 165 115 L165 138 Q145 118 100 115 Q55 118 35 138 Z" fill="white" opacity="0.3"/>
+      <rect x="97" y="60" width="6" height="85" rx="3" fill="url(#g1)"/>
+      <circle cx="70" cy="42" r="14" fill="#059669"/>
+      <path d="M56 70 Q70 56 84 70" stroke="#059669" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <line x1="60" y1="60" x2="50" y2="80" stroke="#059669" stroke-width="4" stroke-linecap="round"/>
+      <line x1="80" y1="60" x2="90" y2="80" stroke="#059669" stroke-width="4" stroke-linecap="round"/>
+      <circle cx="130" cy="42" r="14" fill="#6366f1"/>
+      <path d="M116 70 Q130 56 144 70" stroke="#6366f1" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <line x1="120" y1="60" x2="110" y2="80" stroke="#6366f1" stroke-width="4" stroke-linecap="round"/>
+      <line x1="140" y1="60" x2="150" y2="80" stroke="#6366f1" stroke-width="4" stroke-linecap="round"/>
+      <circle cx="100" cy="30" r="12" fill="url(#g1)" opacity="0.4"/>
+  <div class="hero-badge" id="heroBadge">✦ StudyBuddy</div>
+  <h1>Unlock Your<br><span class="glow">True Potential.</span></h1>
+  <p><i>--Your true <b style="color:#059669">Buddy</b> for your ultimate study--</i></p>
+  <div class="hero-btns">
+    <button class="btn btn-primary" onclick="document.getElementById('dashboard').scrollIntoView({behavior:'smooth'})">Open Workspace ↓</button>
+    <button class="btn btn-ghost" onclick="window.location.href='quiz.html'">
+  ✦ Try AI Quiz
+</button>
+  </div>
+
+  <!-- PLATFORM METRICS -->
+  <div class="platform-metrics" style="display:flex; gap:24px; justify-content:center; margin-top:54px; flex-wrap:wrap; animation: fadeUp 0.8s 0.2s ease both;">
+    <div class="metric-badge" style="background:color-mix(in srgb, var(--surface) 80%, transparent); border:1px solid var(--surface-border); padding:20px 28px; border-radius:20px; backdrop-filter:blur(16px); min-width:180px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+      <div style="font-size:2.2rem; font-weight:800; color:var(--primary); font-family:'Syne',sans-serif;" id="metricInstitutions">124</div>
+      <div style="font-size:0.8rem; color:var(--text-muted); font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">Institutions Joined</div>
+    </div>
+    <div class="metric-badge" style="background:color-mix(in srgb, var(--surface) 80%, transparent); border:1px solid var(--surface-border); padding:20px 28px; border-radius:20px; backdrop-filter:blur(16px); min-width:180px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+      <div style="font-size:2.2rem; font-weight:800; color:var(--primary); font-family:'Syne',sans-serif;" id="metricStudents">50,421</div>
+      <div style="font-size:0.8rem; color:var(--text-muted); font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">Students Active</div>
+    </div>
+    <div class="metric-badge" style="background:color-mix(in srgb, var(--surface) 80%, transparent); border:1px solid var(--surface-border); padding:20px 28px; border-radius:20px; backdrop-filter:blur(16px); min-width:180px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); transition: transform 0.3s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+      <div style="font-size:2.2rem; font-weight:800; color:var(--primary); font-family:'Syne',sans-serif;" id="metricReviews">10,289</div>
+      <div style="font-size:0.8rem; color:var(--text-muted); font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">5-Star Reviews</div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT SECTION -->
+<section id="about" class="about-section container" style="margin-top: 40px; margin-bottom: 60px;">
+  <div class="about-grid">
+    <div class="about-left">
+      <div class="about-logo-bg">
+        <img src="logo.png" alt="StudyBuddy Logo" class="about-logo-img">
+      </div>
+    </div>
+    <div class="about-right">
+      <div class="about-subtitle"></div>
+      <h2 class="about-title">Our Vision</h2>
+      <p class="about-desc"><i>
+We aim to simplify how students learn, focus, and grow in a fast-moving world.
+StudyBuddy brings clarity to chaos by combining smart tools with meaningful guidance.
+We believe consistency beats pressure, and small daily progress leads to big success.
+Our platform is built to help students stay organized, motivated, and in control.
+With intelligent support, we turn studying into a focused and stress-free experience.
+We’re building more than a tool — a companion that grows with every learner.
+A space where every student can unlock their true potential, one day at a time.
+      </i></p>
+      <p><b>- Team StudyBuddy</b></p>
+      <ul class="about-features">
+        <!-- <li>
+          <span class="feat-icon">✔</span>
+          <span class="feat-text">Track performance & analytics</span>
+        </li>
+        <li>
+          <span class="feat-icon">✔</span>
+          <span class="feat-text">AI-powered study assistance</span>
+        </li>
+        <li>
+          <span class="feat-icon">✔</span>
+          <span class="feat-text">Smart planning & productivity tools</span>
+        </li>
+        <li>
+          <span class="feat-icon">✔</span>
+          <span class="feat-text">All-in-one academic workspace</span>
+        </li> -->
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- COMING SOON OVERLAY -->
+<div id="comingSoonOverlay" style="display:none; position:fixed; inset:0; z-index:9999; background:color-mix(in srgb, var(--bg) 85%, transparent); backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px); align-items:center; justify-content:center; flex-direction:column; text-align:center; padding:20px;">
+  <div style="width:120px; height:120px; background:linear-gradient(135deg, var(--primary), var(--accent)); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:3.5rem; margin-bottom:24px; animation: popSpin 3s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite alternate; box-shadow: 0 20px 50px var(--primary-glow);">
+    🚀
+  </div>
+  <h2 style="font-family:'Syne',sans-serif; font-size:2.5rem; font-weight:800; color:var(--text); margin-bottom:12px;">Mode Coming Soon</h2>
+  <p style="font-size:1.1rem; color:var(--text-muted); max-width:500px; line-height:1.6; margin-bottom:30px;">
+    We are crafting an exclusive experience for <span id="overlayRoleName" style="color:var(--primary); font-weight:700;">Teachers</span>. Stay tuned for advanced analytics, classroom management, and more.
+  </p>
+  <button class="btn btn-primary" onclick="handleLogout()" style="padding:14px 32px; font-size:1.05rem;">Log Out</button>
+  <style>
+    @keyframes popSpin {
+      0% { transform: scale(0.9) rotate(-10deg); }
+      50% { transform: scale(1.1) rotate(10deg); box-shadow: 0 30px 60px var(--primary-glow); }
+      100% { transform: scale(0.9) rotate(-10deg); }
+    }
+    body.coming-soon-active { overflow: hidden; }
+  </style>
+</div>
+
+<!-- DASHBOARD -->
+<div class="container" id="dashboard">
+  <div class="section-header">
+    <span class="section-label">Active Workspace</span>
+    <h2>Performance Hub</h2>
+  </div>
+  <div class="grid-12">
+
+    <!-- TIMER -->
+    <div class="card span-12" style="display:flex; gap:24px;" id="timerContainer">
+      <!-- Timer Controls -->
+      <div style="flex:1;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+          <h3>Focus Timer</h3>
+          <span id="sessCount" style="font-size:0.78rem;color:var(--primary);font-weight:700;background:var(--primary-glow);padding:4px 12px;border-radius:50px;">0 sessions</span>
+        </div>
+        <div class="timer-modes">
+          <button class="mode-btn active" onclick="setMode(25,'Focus',this)">Focus</button>
+          <button class="mode-btn" onclick="setMode(5,'Short',this)">Short</button>
+          <button class="mode-btn" onclick="setMode(15,'Long',this)">Long</button>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:center;gap:20px;margin:10px 0;">
+          <button class="stepper-btn" onclick="adjustTimer(-1)" title="Decrease 1 min">−</button>
+          <div class="timer-display" id="display" style="font-size:3.5rem;">25:00</div>
+          <button class="stepper-btn" onclick="adjustTimer(1)" title="Increase 1 min">+</button>
+        </div>
+        <div class="timer-grid">
+          <button class="btn btn-primary" id="startBtn" onclick="startTimer()">▶ Start</button>
+          <button class="btn btn-ghost" onclick="resetTimer()">↺ Reset</button>
+        </div>
+      </div>
+
+      <!-- Session History -->
+      <div class="timer-history-panel" style="flex:1; border-left:1px solid var(--surface-border); padding-left:24px; display:flex; flex-direction:column;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:14px;align-items:center;">
+          <h3 style="font-size:1.1rem;margin:0;">Previous Sessions</h3>
+          <span style="font-size:0.75rem; color:var(--text-muted);font-weight:700;text-transform:uppercase;">Today</span>
+        </div>
+        <div id="sessionHistoryLog" style="flex:1; overflow-y:auto; max-height:220px; display:flex; flex-direction:column; gap:10px; padding-right:8px;">
+          <!-- JS fills this -->
+          <div style="color:var(--text-muted); font-size:0.85rem; text-align:center; margin-top:20px;">No sessions completed yet.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TASKS PLANNER -->
+    <div class="card span-12" id="plannerCard" style="transition: all 0.3s cubic-bezier(0.16,1,0.3,1);">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+        <h3>Smart Calendar</h3>
+        <div style="display:flex;gap:12px;align-items:center;">
+          <span id="taskCount" style="font-size:0.8rem;color:var(--text-muted)"></span>
+          <button class="btn btn-ghost" style="padding: 6px 12px; font-size: 0.95rem; border:1px solid var(--surface-border);" onclick="togglePlannerFullscreen()" title="Expand Calendar">⛶</button>
+          <button class="btn btn-primary" style="padding: 8px 14px; font-size: 0.85rem;" onclick="addTaskPrompt()">+ New Task</button>
+        </div>
+      </div>
+      <div class="planner-grid" id="plannerGrid">
+        <!-- JS fills cols -->
+      </div>
+    </div>
+
+    <!-- STREAK -->
+    <div class="card span-12" id="streakCard">
+      <div class="streak-top">
+        <div>
+          <div class="streak-kicker">Habit Engine</div>
+          <h3 style="margin:6px 0 0;">🔥 Study Streak</h3>
+        </div>
+        <div class="streak-pill" id="streakPill">
+          <span class="streak-fire">🔥</span>
+          <span><span id="streakDays">0</span> day streak</span>
+        </div>
+      </div>
+
+      <div class="streak-grid">
+        <div class="streak-box">
+          <div class="streak-metric">
+            <div class="streak-num"><span id="todayMinutes">0</span><span class="streak-unit">min</span></div>
+            <div class="streak-label">Today</div>
+          </div>
+          <div class="streak-sub" id="streakMsg">Start a focus session to build your streak.</div>
+        </div>
+
+        <div class="streak-box">
+          <div class="streak-metric">
+            <div class="streak-num"><span id="weeklyMinutes">0</span><span class="streak-unit">min</span></div>
+            <div class="streak-label">This week</div>
+          </div>
+
+          <div class="streak-progress">
+            <div class="streak-progress-bar">
+              <div class="streak-progress-fill" id="weeklyFill" style="width:0%"></div>
+            </div>
+            <div class="streak-progress-meta">
+              <span>Goal: <span id="weeklyGoal">420</span> min</span>
+              <span id="weeklyPct">0%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="week-track" id="weekTrack" aria-label="Weekly activity"></div>
+      <div class="streak-warn" id="streakWarn" style="display:none">⚠️ Streak broken. Do a focus session today to restart.</div>
+    </div>
+
+    <!-- NOTES -->
+    <div class="card span-12">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+    <h3>⚡ Scratchpad</h3>
+    <button class="btn btn-primary" onclick="saveNote()">💾 Save</button>
+  </div>
+
+  <input id="noteTitle" class="input-field" placeholder="Note title..." style="margin-bottom:10px;">
+  <textarea id="notePad" placeholder="Write anything..."></textarea>
+</div>
+
+    <!-- COURSES -->
+    <div class="span-12" style="margin-top:16px;">
+      <div class="section-header">
+        <span class="section-label">Curriculum</span>
+        <h2>Course Archive</h2>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;">
+        <div class="card" style="text-align:center;">
+          <div class="course-icon">💻</div>
+          <div class="course-chip">CS Core</div>
+          <h3 style="margin-bottom:6px;">Fundamentals of C</h3>
+          <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:16px;">24CSE0107 · Mr. Yogesh Bajpai</p>
+          <button class="btn btn-ghost" style="width:100%" onclick="openLib('c')">View Details →</button>
+        </div>
+        <div class="card" style="text-align:center;">
+          <div class="course-icon">🤖</div>
+          <div class="course-chip">AI/ML</div>
+          <h3 style="margin-bottom:6px;">Foundations of AI</h3>
+          <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:16px;">25CAI0102 · Mr. Prabhjot Manocha</p>
+          <button class="btn btn-ghost" style="width:100%" onclick="openLib('ai')">View Details →</button>
+        </div>
+        <div class="card" style="text-align:center;">
+          <div class="course-icon">🌐</div>
+          <div class="course-chip">Web Dev</div>
+          <h3 style="margin-bottom:6px;">Front End Engineering</h3>
+          <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:16px;">25CSE0105 · Mr. Sourabh Batra</p>
+          <button class="btn btn-ghost" style="width:100%" onclick="openLib('fe')">View Details →</button>
+        </div>
+        <div class="card" style="text-align:center;">
+          <div class="course-icon">🐧</div>
+          <div class="course-chip">Systems</div>
+          <h3 style="margin-bottom:6px;">OS & Linux</h3>
+          <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:16px;">25CSE0104 · Mr. Rahul Trivedi</p>
+          <button class="btn btn-ghost" style="width:100%" onclick="openLib('os')">View Details →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- GPA -->
+    <div class="card span-12" id="tracker">
+      <h3 style="margin-bottom:18px;">📈 Grade Tracker</h3>
+      <div id="gpa-inputs">
+        <div class="gpa-row"><input class="input-field" placeholder="Subject" value="C Programming"><input type="number" class="input-field grade" placeholder="Grade" value="85"></div>
+        <div class="gpa-row"><input class="input-field" placeholder="Subject" value="AI Algorithms"><input type="number" class="input-field grade" placeholder="Grade" value="78"></div>
+        <div class="gpa-row"><input class="input-field" placeholder="Subject" value="Front End Engg"><input type="number" class="input-field grade" placeholder="Grade" value="91"></div>
+        <div class="gpa-row"><input class="input-field" placeholder="Subject" value="OS & Linux"><input type="number" class="input-field grade" placeholder="Grade" value="82"></div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:12px;">
+        <button class="btn btn-primary" style="flex:1" onclick="calcGPA()">Calculate</button>
+        <button class="btn btn-ghost" onclick="addGPARow()">+ Subject</button>
+      </div>
+      <div id="gpaResult" class="gpa-result"></div>
+    </div>
+
+    <!-- AI QUIZ -->
+
+    </div>
+  </div>
+</div>
+
+<!-- SYLLABUS SECTION -->
+<div class="container" id="syllabus-section">
+  <div class="section-header">
+    <span class="section-label">Academic Plan</span>
+    <h2>Course Syllabus</h2>
+  </div>
+  <div class="syllabus-tabs">
+    <button class="syl-tab active" onclick="switchTab('c',this)">💻 C Programming</button>
+    <button class="syl-tab" onclick="switchTab('ai',this)">🤖 AI Algorithms</button>
+    <button class="syl-tab" onclick="switchTab('fe',this)">🌐 Front End Engg</button>
+    <button class="syl-tab" onclick="switchTab('os',this)">🐧 OS & Linux</button>
+  </div>
+  <!-- C PROGRAMMING -->
+  <div class="syl-panel active" id="syl-c">
+    <div class="syl-course-header">
+      <div class="syl-course-icon">💻</div>
+      <div>
+        <div class="syl-course-name">Fundamentals of C Programming</div>
+        <div class="syl-course-meta">Code: 24CSE0107 · L-T-P: 2-0-4 · 4 Credits · Jan–June 2026 · Mr. Yogesh Bajpai</div>
+      </div>
+    </div>
+    <div class="syl-grid">
+      <div class="syl-box">
+        <div class="syl-box-title">📚 Syllabus Topics</div>
+        <div class="syl-item"><div class="syl-dot"></div><span>Introduction to C: History, preprocessor, syntax, I/O (printf/scanf), variables, data types, operators, type conversion (15 lectures, 20%)</span></div>
+        <div class="syl-item"><div class="syl-dot"></div><span>Control Flow: if/else, switch, loops, arrays, strings, functions, recursion, storage classes (15 lectures, 30%)</span></div>
+        <div class="syl-item"><div class="syl-dot"></div><span>Pointers: Memory addresses, pointer arithmetic, dynamic memory allocation, malloc/calloc/realloc/free, memory leaks (15 lectures, 25%)</span></div>
+        <div class="syl-item"><div class="syl-dot"></div><span>User-Defined Types: Structures, unions, enumerations, typedef, file handling, preprocessor directives, bit fields (15 lectures, 25%)</span></div>
+      </div>
+      <div>
+        <div class="syl-box" style="margin-bottom:16px;">
+          <div class="syl-box-title">📅 Lecture Schedule</div>
+          <div class="syl-lect"><span>Lectures 1–24</span><span class="syl-lect-num">Sessional Test 1</span></div>
+          <div class="syl-lect"><span>Lectures 25–48</span><span class="syl-lect-num">Sessional Test 2</span></div>
+          <div class="syl-lect"><span>Lectures 1–60</span><span class="syl-lect-num">End Term Exam</span></div>
+        </div>
+        <div class="syl-box">
+          <div class="syl-box-title">📊 Evaluation</div>
+          <div class="assess-row"><span>Lab Evaluations (6×)</span><span class="assess-badge badge-green">20%</span></div>
+          <div class="assess-row"><span>Sessional Tests (2×)</span><span class="assess-badge badge-blue">30%</span></div>
+          <div class="assess-row"><span>End Term Exam</span><span class="assess-badge badge-green">50%</span></div>
+          <div style="font-size:0.75rem;color:var(--text-muted);margin-top:10px;">75% attendance required. Min 50% in both internal and end-term to pass.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- AI ALGORITHMS -->
+  <div class="syl-panel" id="syl-ai">
+    <div class="syl-course-header">
+      <div class="syl-course-icon">🤖</div>
+      <div>
+        <div class="syl-course-name">Foundations of AI Algorithms</div>
+        <div class="syl-course-meta">Code: 25CAI0102 · L-T-P: 2-0-2 · 3 Credits · Jan–June 2026 · Mr. Prabhjot Manocha</div>
+      </div>
+    </div>
+    <div class="syl-grid">
+      <div class="syl-box">
+        <div class="syl-box-title">📚 Syllabus Topics</div>
+        <div class="syl-item"><div class="syl-dot"></div><span>Soft Computing Intro: Hard vs Soft computing, Fuzzy/Neural/GA/ART techniques (3 lectures, 10%)</span></div>
+        <div class="syl-item"><div class="syl-dot"></div><span>Fuzzy Systems: Fuzzy sets, membership functions, set operations, FIS (9 lectures, 30%)</span></div>
+        <div class="syl-item"><div class="syl-dot"></div><span>Artificial Neural Networks: ANN architecture, Backpropagation, Perceptron, Adaline (12 lectures, 40%)</span></div>
+        <div class="syl-item"><div class="syl-dot"></div><span>Genetic Algorithms: Encoding, fitness function, crossover, mutation (6 lectures, 20%)</span></div>
+      </div>
+      <div>
+        <div class="syl-box" style="margin-bottom:16px;">
+          <div class="syl-box-title">📅 Lab Plan (Azure Cloud)</div>
+          <div class="syl-lect"><span>Lect 1–12</span><span class="syl-lect-num">Sessional Test 1</span></div>
+          <div class="syl-lect"><span>Lect 13–26</span><span class="syl-lect-num">Sessional Test 2</span></div>
+          <div class="syl-lect"><span>Lect 1–30</span><span class="syl-lect-num">End Term Exam</span></div>
+        </div>
+        <div class="syl-box">
+          <div class="syl-box-title">📊 Evaluation</div>
+          <div class="assess-row"><span>Microsoft Certification</span><span class="assess-badge badge-green">20%</span></div>
+          <div class="assess-row"><span>Sessional Tests (2×)</span><span class="assess-badge badge-blue">30%</span></div>
+          <div class="assess-row"><span>End Term Exam (Online)</span><span class="assess-badge badge-green">50%</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- FRONT END ENGINEERING -->
+  <div class="syl-panel" id="syl-fe">
+    <div class="syl-course-header">
+      <div class="syl-course-icon">🌐</div>
+      <div>
+        <div class="syl-course-name">Front End Engineering – 1</div>
+        <div class="syl-course-meta">Code: 25CSE0105 · L-T-P: 2-0-2 · 3 Credits · Jan–June 2026 · Mr. Sourabh Batra</div>
+      </div>
+    </div>
+    <div class="syl-grid">
+      <div class="syl-box">
+        <div class="syl-box-title">📚 Syllabus Topics</div>
+        <div class="syl-item"><div class="syl-dot"></div><span>JS Basics: ECMAScript, var/let/const, data types, arrays, objects, functions (12 lectures, 27%)</span></div>
+        <div class="syl-item"><div class="syl-dot"></div><span>Advanced JS: Arrow functions, closures, DOM manipulation, event handling (18 lectures, 40%)</span></div>
+        <div class="syl-item"><div class="syl-dot"></div><span>Async & Git: Promises, async/await, event loop, Git & GitHub workflows (15 lectures, 33%)</span></div>
+      </div>
+      <div>
+        <div class="syl-box" style="margin-bottom:16px;">
+          <div class="syl-box-title">📅 Assessment Schedule</div>
+          <div class="syl-lect"><span>Lectures 1–18</span><span class="syl-lect-num">Sessional Test 1</span></div>
+          <div class="syl-lect"><span>Lectures 19–34</span><span class="syl-lect-num">Sessional Test 2</span></div>
+          <div class="syl-lect"><span>Full Syllabus</span><span class="syl-lect-num">End Term Exam</span></div>
+        </div>
+        <div class="syl-box">
+          <div class="syl-box-title">📊 Evaluation</div>
+          <div class="assess-row"><span>Project Synopsis + Viva</span><span class="assess-badge badge-green">20%</span></div>
+          <div class="assess-row"><span>Sessional Tests (2×)</span><span class="assess-badge badge-blue">30%</span></div>
+          <div class="assess-row"><span>End Term Exam (Online)</span><span class="assess-badge badge-green">50%</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- OS & LINUX -->
+  <div class="syl-panel" id="syl-os">
+    <div class="syl-course-header">
+      <div class="syl-course-icon">🐧</div>
+      <div>
+        <div class="syl-course-name">Operating System and Linux Fundamentals</div>
+        <div class="syl-course-meta">Code: 25CSE0104 · L-T-P: 2-0-2 · 3 Credits · Jan–June 2026 · Mr. Rahul Trivedi</div>
+      </div>
+    </div>
+    <div class="syl-grid">
+      <div class="syl-box">
+        <div class="syl-box-title">📚 Syllabus Topics</div>
+        <div class="syl-item"><div class="syl-dot"></div><span>OS Intro & Linux: Dual-mode, system calls, Linux commands (8 lectures, 20%)</span></div>
+        <div class="syl-item"><div class="syl-dot"></div><span>Process Management: PCB, states, threading, CPU scheduling (8 lectures, 25%)</span></div>
+        <div class="syl-item"><div class="syl-dot"></div><span>Synchronization & Deadlocks: Semaphores, mutex, Banker's Algorithm (9 lectures, 20%)</span></div>
+        <div class="syl-item"><div class="syl-dot"></div><span>Memory Management: Paging, virtual memory, page replacement (11 lectures, 20%)</span></div>
+        <div class="syl-item"><div class="syl-dot"></div><span>File Systems: Allocation methods, disk scheduling, Linux file commands (9 lectures, 15%)</span></div>
+      </div>
+      <div>
+        <div class="syl-box" style="margin-bottom:16px;">
+          <div class="syl-box-title">📅 Assessment Schedule</div>
+          <div class="syl-lect"><span>Lectures 1–16</span><span class="syl-lect-num">Sessional Test 1</span></div>
+          <div class="syl-lect"><span>Lectures 17–36</span><span class="syl-lect-num">Sessional Test 2</span></div>
+          <div class="syl-lect"><span>Full Syllabus</span><span class="syl-lect-num">End Term Exam</span></div>
+        </div>
+        <div class="syl-box">
+          <div class="syl-box-title">📊 Evaluation</div>
+          <div class="assess-row"><span>Lab Evaluations (Viva + Test)</span><span class="assess-badge badge-green">20%</span></div>
+          <div class="assess-row"><span>Sessional Tests (2×)</span><span class="assess-badge badge-blue">30%</span></div>
+          <div class="assess-row"><span>End Term Exam (Online)</span><span class="assess-badge badge-green">50%</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- COURSE MODAL -->
+<div class="modal" id="libModal" onclick="if(event.target===this)closeModal()">
+  <div class="modal-content">
+    <button class="close-btn" onclick="closeModal()">✕</button>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+
+
+<footer class="premium-footer">
+  <div class="footer-top-divider"></div>
+  <div class="footer-container grid-4-col">
+
+    <!-- BRAND -->
+    <div class="footer-brand">
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+        <img src="logo.png" alt="StudyBuddy" style="height:44px; object-fit:contain;">
+        <h2 class="footer-logo" style="margin:0;">StudyBuddy</h2>
+      </div>
+      <p class="footer-desc">Your intelligent academic companion. Track progress, improve performance, and stay inspired.</p>
+      <div class="footer-socials">
+        <a href="#" aria-label="Github"><svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg></a>
+        <a href="#" aria-label="LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v-1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg></a>
+      </div>
+    </div>
+
+    <!-- NAV LINKS -->
+    <div class="footer-links-col">
+      <h4 class="footer-title">Platform</h4>
+      <ul class="footer-list">
+        <li><a href="dashboard.html">Dashboard</a></li>
+        <li><a href="analytics.html">Analytics</a></li>
+        <li><a href="compiler.html">AI Code Lab</a></li>
+        <li><a href="quiz.html">AI Quiz</a></li>
+        <li><a href="resources.html">Resource Hub</a></li>
+        <li><a href="#">AI Chatbot</a></li>
+        <li><a href="#">Notes & PDFs</a></li>
+      </ul>
+    </div>
+
+    <!-- RESOURCES -->
+    <div class="footer-links-col">
+      <h4 class="footer-title">Resources</h4>
+      <ul class="footer-list">
+        <li><a href="#">Help & Docs</a></li>
+        <li><a href="#">Privacy Policy</a></li>
+        <li><a href="#">Terms of Service</a></li>
+        <li><a href="#">Contact Us</a></li>
+      </ul>
+    </div>
+
+    <!-- SUBSCRIBE -->
+    <div class="footer-subscribe">
+      <h4 class="footer-title">Stay Updated</h4>
+      <p class="footer-desc">Get the latest AI study hacks.</p>
+      <div class="subscribe-input-group">
+        <input type="email" placeholder="you@email.com" class="sub-input" aria-label="Email Address">
+        <button class="sub-btn">Subscribe</button>
+      </div>
+      <span class="sub-note">No spam, ever.</span>
+    </div>
+
+  </div>
+
+  <div class="footer-bottom glass-bottom">
+    <div class="footer-bottom-flex">
+      <span>© <span id="currentYear"></span> StudyBuddy &nbsp;</span>
+      <span class="built-with"> Built with ❤️ by Krishna | Akshat | Mokshika | Khwaish</span>
+    </div>
+  </div>
+</footer>
+
+<!-- 🤖 FLOATING AI CHATBOT -->
+<div class="chat-overlay" id="chatOverlay" onclick="toggleChatbotFullscreen()"></div>
+<div class="chatbot-wrapper" id="chatbotWrapper">
+
+  <!-- Floating Button -->
+  <button class="chatbot-toggle" onclick="toggleChatbot()">
+    <span style="font-size:1.4rem;">✨</span>
+  </button>
+
+  <!-- Chat Window -->
+  <div class="chatbot-box" id="chatbotBox" style="display:none;">
+
+    <div class="chatbot-header">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-size:1.2rem;">🤖</span>
+        <span style="font-weight:700;font-size:0.95rem;">StudyBuddy AI</span>
+      </div>
+      <div>
+        <button class="cb-btn" onclick="toggleChatHistoryMenu()" title="Recent Chats" style="margin-right:4px;">🕒</button>
+        <button class="cb-btn" onclick="startNewChat()" title="Start New Chat" style="margin-right:4px;">➕</button>
+        <button class="cb-btn" onclick="toggleChatbotFullscreen()" title="Toggle Fullscreen">⛶</button>
+        <button class="cb-btn" onclick="toggleChatbot()" title="Close">✕</button>
+      </div>
+    </div>
+    
+    <!-- Chat History Sidebar -->
+    <div id="chatHistoryMenu" style="display:none; position:absolute; top:54px; right:0; width:220px; background:var(--bg-2); border-left:1px solid var(--surface-border); border-bottom:1px solid var(--surface-border); border-radius:0 0 0 16px; padding:12px; z-index:10; box-shadow:-4px 10px 20px rgba(0,0,0,0.1); max-height:200px; overflow-y:auto;">
+      <div style="font-size:0.75rem; font-weight:700; color:var(--text-muted); text-transform:uppercase; margin-bottom:8px;">Recent Chats</div>
+      <div id="chatHistoryList" style="display:flex; flex-direction:column; gap:6px;">
+        <!-- JS fills this -->
+      </div>
+    </div>
+
+    <div class="chatbot-messages" id="chatMessages">
+      <div class="bot-msg">👋 Hi! I'm your AI Buddy. Ask me anything!</div>
+    </div>
+
+    <div class="chatbot-suggestions" id="chatSuggestions">
+      <button onclick="insertChat('Start 25 min focus session?', true)">🎯 Focus</button>
+      <button onclick="insertChat('How can I improve?', true)">📈 Improve</button>
+      <button onclick="insertChat('Quiz me on C pointers', true)">📝 Quiz</button>
+    </div>
+
+    <div class="chatbot-input">
+      <input type="text" id="chatInput" placeholder="Ask something..." 
+        onkeydown="if(event.key==='Enter')sendMessage()">
+      <button onclick="sendMessage()">➤</button>
+    </div>
+
+  </div>
+</div>
+<script src="app.js"></script>
+</body>
+</html>

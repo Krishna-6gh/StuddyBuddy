@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>StudyBuddy Auth</title>
+
+  <style>
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: #f0fdf4;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    .auth-box {
+      background: white;
+      padding: 30px;
+      border-radius: 20px;
+      width: 320px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      background: #059669;
+      color: white;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    .switch {
+      text-align: center;
+      margin-top: 10px;
+      cursor: pointer;
+      color: #059669;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="auth-box">
+  <h2 id="title">Login</h2>
+
+  <input type="text" id="name" placeholder="Name" style="display:none;">
+  <input type="email" id="email" placeholder="Email">
+  <input type="password" id="password" placeholder="Password">
+
+  <button onclick="handleAuth()">Continue</button>
+
+  <p class="switch" onclick="toggleMode()">Switch to Register</p>
+</div>
+
+<script>
+let isLogin = true;
+
+function toggleMode() {
+  isLogin = !isLogin;
+
+  document.getElementById("title").textContent = isLogin ? "Login" : "Register";
+  document.getElementById("name").style.display = isLogin ? "none" : "block";
+  document.querySelector(".switch").textContent =
+    isLogin ? "Switch to Register" : "Switch to Login";
+}
+
+function handleAuth() {
+  const name = document.getElementById("name").value;
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  let users = JSON.parse(localStorage.getItem("users") || "[]");
+
+  if (isLogin) {
+    const user = users.find(u => u.email === email && u.password === password);
+
+    if (!user) {
+      alert("Invalid credentials");
+      return;
+    }
+
+    localStorage.setItem("currentUser", JSON.stringify(user));
+    window.location.href = "dashboard.html";
+
+  } else {
+    const exists = users.find(u => u.email === email);
+    if (exists) {
+      alert("User already exists");
+      return;
+    }
+
+    const newUser = { name, email, password };
+    users.push(newUser);
+
+    localStorage.setItem("users", JSON.stringify(users));
+    alert("Registered successfully!");
+
+    toggleMode();
+  }
+}
+</script>
+
+</body>
+</html>
