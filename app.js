@@ -235,7 +235,7 @@ function animateMetrics() {
 // ============================================================
 //  QUIZ HISTORY RENDERING
 //  Reads from 'sb_quiz_history' — written by both quiz.js and app.js showResults()
-//  Looks for these IDs in dashboard.html:
+//  Looks for these IDs in index.html:
 //    #recentQuizzesContainer  → last 5 quizzes (dashboard "Recent" widget)
 //    #myQuizzesContainer      → full history list (My Quizzes section)
 //    #quizCountStat           → total quizzes done (hero stat)
@@ -529,7 +529,7 @@ function saveSettings() {
   setTimeout(() => closeSettings(), 650);
 }
 
-// Settings tabs (used by dashboard.html)
+// Settings tabs (used by index.html)
 function openSettingsTab(key) {
   const keys = ['profile', 'appearance', 'productivity', 'timetable', 'system'];
   keys.forEach(k => {

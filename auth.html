@@ -96,7 +96,7 @@ function handleAuth() {
     }
 
     localStorage.setItem("currentUser", JSON.stringify(user));
-    window.location.href = "dashboard.html";
+    window.location.href = "index.html";
 
   } else {
     const exists = users.find(u => u.email === email);
